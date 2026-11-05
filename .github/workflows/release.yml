@@ -1,0 +1,36 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Check tag against Info.json
+        run: |
+          node -e '
+            const info = require("./Info.json");
+            const tag = process.env.GITHUB_REF_NAME.replace(/^v/, "");
+            if (info.version !== tag) {
+              throw new Error(`tag ${tag} does not match Info.json version ${info.version}`);
+            }
+            if (!Number.isInteger(info.ghVersion) || info.ghVersion < 1) {
+              throw new Error("Info.json ghVersion must be a positive integer");
+            }
+          '
+      - run: make test
+      - run: make build
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/*.iinaplgz --generate-notes --title "$GITHUB_REF_NAME"

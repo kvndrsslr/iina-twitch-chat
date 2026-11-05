@@ -28,6 +28,10 @@ Then either
 * copy/symlink `dist/Twitch.iinaplugin/` into
   `~/Library/Application Support/com.colliderli.iina/plugins/`.
 
+Or install from GitHub: **IINA → Settings → Plugins → *Install from GitHub…*** and enter
+`kvndrsslr/iina-twitch-chat`. IINA downloads `Twitch.iinaplgz` from the latest release and prompts
+for an update when `ghVersion` in `Info.json` increases.
+
 Two things bite here, both verified against IINA 1.5.0:
 
 * **The package must hold the plugin's contents at its archive root.** IINA unpacks a package with
@@ -43,7 +47,8 @@ Two things bite here, both verified against IINA 1.5.0:
   nothing else happens.
 
 `dist/` is a build artifact produced by `make build` (and removed by `make clean`): it is
-git-ignored and not part of the repository, so build it locally before installing.
+git-ignored and not part of the repository, so build it locally before installing that way. The
+GitHub install path uses the package attached to the latest release instead.
 
 Or copy/symlink the plugin folder by hand:
 
@@ -85,6 +90,12 @@ sidebar's/overlay's context menu → *Reload* — that also re-runs `ui/transpor
 | `make link` | symlink the repo into IINA's plugin folder as `iina-twitch-chat.iinaplugin-dev` |
 | `make unlink` | remove that symlink |
 | `make clean` | remove `dist/` |
+
+### Releasing
+
+Bump `version` and `ghVersion` in `Info.json`, commit, then push a `v<version>` tag. The release
+workflow runs the tests, builds the package and attaches it to the GitHub release; IINA compares
+`ghVersion` against `main` and prompts installed users when it increases.
 
 ---
 
