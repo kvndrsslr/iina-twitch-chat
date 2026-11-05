@@ -1,0 +1,438 @@
+/*
+ * ui/browser.css - the sidebar's Twitch browser and settings view.
+ *
+ * Colours come from the custom properties in chat.css, so the light/dark
+ * appearance and the four twitch-tui palettes work here unchanged.
+ */
+
+/* -------------------------------------------------------------------- tabs */
+
+/* A narrow sidebar keeps the strip on one line: it scrolls horizontally
+ * (hidden scrollbar) instead of wrapping and eating vertical space. */
+.twt-tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1 1 auto;
+  min-width: 0;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.twt-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.twt-tab {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  font: inherit;
+  color: var(--twt-dim);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 2px 8px;
+  cursor: pointer;
+}
+
+.twt-tab:hover {
+  background: var(--twt-hover);
+}
+
+.twt-tab.twt-tab-active {
+  color: var(--twt-fg);
+  border-color: var(--twt-border);
+  background: var(--twt-input-bg);
+}
+
+/* ------------------------------------------------------------------- panes */
+
+/* The nav bar is the header's second row, so the nav's own border is the
+ * divider and the header must not draw a second one on the sidebar. (The
+ * overlay's .twt-header lives outside .twt-root and is untouched.) */
+.twt-root .twt-header {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+/* the nav row inherits the header's horizontal padding already */
+.twt-root .twt-header .twt-nav {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.twt-nav {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--twt-border);
+  min-width: 0;
+}
+
+.twt-nav-title {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+/* One scroll container per tab; the hidden ones keep their DOM (and their
+ * scroll position) untouched. */
+.twt-pane {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+  padding: 2px 0 10px;
+}
+
+.twt-pane[hidden] {
+  display: none;
+}
+
+/* --------------------------------------------------------------- status bar */
+
+/* Pinned footer: the header and this bar stay put while the active tab pane
+ * (the only scroll container) scrolls, so the last row never hides behind it. */
+.twt-status-bar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-top: 1px solid var(--twt-border);
+  min-width: 0;
+  color: var(--twt-dim);
+}
+
+.twt-status-bar .twt-status {
+  flex: 1 1 auto;
+}
+
+/* ------------------------------------------------------------------- lists */
+
+.twt-browser-section {
+  padding: 4px 0;
+}
+
+.twt-browser-heading {
+  margin: 8px 0 3px;
+  padding: 0 8px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--twt-faint);
+}
+
+.twt-browser-list {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.twt-browser-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  min-width: 0;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.twt-browser-row:hover {
+  background: var(--twt-hover);
+}
+
+.twt-browser-row-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1 1 auto;
+  gap: 1px;
+}
+
+.twt-browser-name {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.twt-browser-title {
+  color: var(--twt-fg);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.twt-browser-meta {
+  color: var(--twt-dim);
+  font-size: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.twt-browser-note {
+  padding: 8px;
+  color: var(--twt-dim);
+  line-height: 1.45;
+}
+
+.twt-load-more {
+  align-self: center;
+  margin: 6px 8px;
+}
+
+/* ----------------------------------------------------------------- images */
+
+/* A fixed-size slot that reserves the space before an image loads, so a late
+ * or failed image never shifts the row; a missing / non-CDN / errored image
+ * leaves the neutral background. */
+.twt-image-box {
+  flex: 0 0 auto;
+  display: block;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--twt-hover);
+}
+
+.twt-image-box img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* `flex: 0 0 <size>` on every box: a width alone does not stop a flex item
+ * from shrinking, and a row that also carries the watch affordance must never
+ * squash the avatar into a sliver. */
+.twt-avatar-box {
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.twt-channel-avatar-box {
+  flex: 0 0 56px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+}
+
+.twt-stream-box,
+.twt-vod-box {
+  flex: 0 0 76px;
+  width: 76px;
+  height: 43px;
+}
+
+.twt-art-box {
+  flex: 0 0 36px;
+  width: 36px;
+  height: 48px;
+  border-radius: 6px;
+}
+
+.twt-live-thumb-box {
+  flex: 0 0 120px;
+  width: 120px;
+  height: 68px;
+  border-radius: 0;
+}
+
+.twt-art-placeholder {
+  background: var(--twt-hover);
+}
+
+/* --------------------------------------------------------------- live item */
+
+/* The live item's own affordance: thumbnail + "Watch", opening the stream. */
+.twt-live-affordance {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.twt-watch {
+  padding: 2px 8px;
+}
+
+.twt-follow[data-live="true"] .twt-browser-name::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 5px;
+  border-radius: 50%;
+  background: #ff3b30;
+  vertical-align: middle;
+}
+
+.twt-live-label {
+  align-self: flex-start;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #fff;
+  background: #ff3b30;
+  border-radius: 3px;
+  padding: 0 4px;
+}
+
+/* ---------------------------------------------------------------- category */
+
+.twt-browser-list-grid {
+  gap: 1px;
+}
+
+/* ----------------------------------------------------------------- channel */
+
+.twt-channel-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 8px 6px;
+}
+
+.twt-channel-main {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.twt-channel-name {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.twt-channel-login {
+  color: var(--twt-dim);
+  font-size: 10px;
+}
+
+.twt-channel-description {
+  margin: 4px 0 0;
+  color: var(--twt-dim);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.twt-channel-live {
+  padding: 2px 0;
+}
+
+.twt-live-block {
+  margin: 4px 8px;
+  padding: 0;
+  border: 1px solid var(--twt-border);
+  border-radius: var(--twt-radius);
+  overflow: hidden;
+  align-items: stretch;
+}
+
+.twt-live-block .twt-browser-row-main {
+  padding: 6px 8px;
+  justify-content: center;
+}
+
+/* ------------------------------------------------------------- vod browser */
+
+.twt-vod-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px 4px;
+}
+
+.twt-vod-label {
+  color: var(--twt-dim);
+  font-size: 11px;
+}
+
+.twt-vod-type {
+  flex: 0 0 auto;
+  max-width: 140px;
+}
+
+.twt-search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 8px 4px;
+}
+
+.twt-search .twt-input {
+  flex: 1 1 auto;
+}
+
+.twt-video-hint {
+  padding-top: 0;
+}
+
+/* ------------------------------------------------------------------ errors */
+
+.twt-browser-error {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  margin: 10px 8px;
+  padding: 10px;
+  border: 1px solid var(--twt-border);
+  border-radius: var(--twt-radius);
+  background: var(--twt-input-bg);
+}
+
+.twt-browser-error-title {
+  font-weight: 600;
+}
+
+.twt-browser-error-text {
+  color: var(--twt-dim);
+  line-height: 1.45;
+}
+
+.twt-browser-error .twt-btn {
+  margin-top: 2px;
+}
+
+/* ---------------------------------------------------------------- settings */
+
+/* The settings pane borrows .twt-pane's scroll container; only its padding
+ * differs. */
+.twt-settings {
+  padding: 6px 8px 14px;
+}
+
+.twt-settings h3 {
+  margin: 10px 0 2px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--twt-faint);
+}
+
+.twt-settings .twt-field {
+  padding: 1px 0;
+}
+
+.twt-note {
+  color: var(--twt-dim);
+  font-size: 10px;
+  margin-top: 8px;
+  line-height: 1.4;
+}

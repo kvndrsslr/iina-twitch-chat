@@ -1,0 +1,525 @@
+/*
+ * Twitch - shared styles for the sidebar and the video overlay.
+ *
+ * The web views have transparent backgrounds, so the colours follow the system
+ * appearance by default (prefers-color-scheme). When the twitch-tui config
+ * pins a theme, [data-theme] on <body> wins over the system appearance.
+ */
+
+:root {
+  --twt-fg: #1b1b1f;
+  --twt-dim: rgba(0, 0, 0, 0.55);
+  --twt-faint: rgba(0, 0, 0, 0.35);
+  --twt-border: rgba(0, 0, 0, 0.12);
+  --twt-hover: rgba(0, 0, 0, 0.05);
+  --twt-input-bg: rgba(255, 255, 255, 0.85);
+  --twt-accent: #7b5cff;
+  --twt-mention: rgba(123, 92, 255, 0.16);
+  --twt-system: rgba(0, 0, 0, 0.55);
+  --twt-overlay-panel: rgba(250, 250, 252, 0.72);
+  --twt-overlay-shadow: 0 2px 14px rgba(0, 0, 0, 0.28);
+  --twt-radius: 8px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --twt-fg: #ececf1;
+    --twt-dim: rgba(255, 255, 255, 0.58);
+    --twt-faint: rgba(255, 255, 255, 0.38);
+    --twt-border: rgba(255, 255, 255, 0.14);
+    --twt-hover: rgba(255, 255, 255, 0.07);
+    --twt-input-bg: rgba(255, 255, 255, 0.09);
+    --twt-mention: rgba(160, 130, 255, 0.22);
+    --twt-system: rgba(255, 255, 255, 0.55);
+    --twt-overlay-panel: rgba(16, 16, 20, 0.64);
+    --twt-overlay-shadow: 0 2px 16px rgba(0, 0, 0, 0.55);
+  }
+}
+
+[data-theme="light"] {
+  --twt-fg: #1b1b1f;
+  --twt-dim: rgba(0, 0, 0, 0.55);
+  --twt-faint: rgba(0, 0, 0, 0.35);
+  --twt-border: rgba(0, 0, 0, 0.12);
+  --twt-hover: rgba(0, 0, 0, 0.05);
+  --twt-input-bg: rgba(255, 255, 255, 0.85);
+  --twt-mention: rgba(123, 92, 255, 0.16);
+  --twt-system: rgba(0, 0, 0, 0.55);
+  --twt-overlay-panel: rgba(250, 250, 252, 0.72);
+  --twt-overlay-shadow: 0 2px 14px rgba(0, 0, 0, 0.28);
+}
+
+[data-theme="dark"] {
+  --twt-fg: #ececf1;
+  --twt-dim: rgba(255, 255, 255, 0.58);
+  --twt-faint: rgba(255, 255, 255, 0.38);
+  --twt-border: rgba(255, 255, 255, 0.14);
+  --twt-hover: rgba(255, 255, 255, 0.07);
+  --twt-input-bg: rgba(255, 255, 255, 0.09);
+  --twt-mention: rgba(160, 130, 255, 0.22);
+  --twt-system: rgba(255, 255, 255, 0.55);
+  --twt-overlay-panel: rgba(16, 16, 20, 0.64);
+  --twt-overlay-shadow: 0 2px 16px rgba(0, 0, 0, 0.55);
+}
+
+/* twitch-tui palettes drive the accent colour; username colours are
+ * computed in JS by lib/emotes.js userColor(). */
+[data-palette="pastel"] { --twt-accent: #b48ef0; }
+[data-palette="vibrant"] { --twt-accent: #ff5c8a; }
+[data-palette="warm"] { --twt-accent: #ff8a3d; }
+[data-palette="cool"] { --twt-accent: #3dc9ff; }
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  color: var(--twt-fg);
+  font: 12px/1.4 -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+.twt-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+/* ------------------------------------------------------------------ header */
+
+.twt-header {
+  flex: 0 0 auto;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--twt-border);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.twt-header-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.twt-spacer {
+  flex: 1 1 auto;
+}
+
+.twt-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--twt-faint);
+  flex: 0 0 auto;
+}
+
+.twt-dot[data-state="connected"] { background: #35c759; }
+.twt-dot[data-state="connecting"],
+.twt-dot[data-state="reconnecting"] { background: #ffb020; }
+.twt-dot[data-state="error"],
+.twt-dot[data-state="failed"] { background: #ff3b30; }
+
+.twt-status {
+  color: var(--twt-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  font-size: 11px;
+}
+
+.twt-channel {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------ inputs */
+
+.twt-input,
+.twt-select,
+.twt-btn,
+.twt-icon-btn,
+.twt-textarea {
+  font: inherit;
+  color: var(--twt-fg);
+  background: var(--twt-input-bg);
+  border: 1px solid var(--twt-border);
+  border-radius: 6px;
+  padding: 3px 6px;
+  min-width: 0;
+}
+
+.twt-input::placeholder,
+.twt-textarea::placeholder {
+  color: var(--twt-faint);
+}
+
+.twt-input,
+.twt-select,
+.twt-textarea {
+  flex: 1 1 auto;
+}
+
+.twt-textarea {
+  resize: vertical;
+  min-height: 48px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+}
+
+.twt-btn {
+  flex: 0 0 auto;
+  cursor: pointer;
+}
+
+.twt-icon-btn {
+  flex: 0 0 auto;
+  cursor: pointer;
+  width: 22px;
+  padding: 2px 0;
+  text-align: center;
+}
+
+.twt-btn:disabled,
+.twt-input:disabled,
+.twt-textarea:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ------------------------------------------------------------------- list */
+
+.twt-messages {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 4px 0 6px;
+  min-height: 0;
+  overflow-wrap: anywhere;
+}
+
+.twt-msg {
+  padding: 1px 8px;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0 4px;
+}
+
+.twt-msg:hover {
+  background: var(--twt-hover);
+}
+
+.twt-msg.twt-mention {
+  background: var(--twt-mention);
+}
+
+.twt-msg.twt-action .twt-text {
+  font-style: italic;
+}
+
+.twt-time {
+  color: var(--twt-faint);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  flex: 0 0 auto;
+}
+
+.twt-name {
+  font-weight: 600;
+  flex: 0 0 auto;
+}
+
+.twt-badge,
+.twt-emote {
+  display: inline-block;
+  vertical-align: middle;
+  image-rendering: -webkit-optimize-contrast;
+}
+
+.twt-badge {
+  height: 16px;
+  margin-top: -2px;
+}
+
+.twt-emote {
+  height: 24px;
+  margin: -2px 1px;
+}
+
+.twt-text {
+  flex: 1 1 auto;
+  white-space: pre-wrap;
+  min-width: 0;
+}
+
+.twt-chip {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border: 1px solid var(--twt-border);
+  border-radius: 4px;
+  padding: 0 3px;
+  color: var(--twt-dim);
+  flex: 0 0 auto;
+}
+
+/* Replayed VOD rows: a muted offset into the video plus a small chip. Both use
+ * the shared theme variables, so they follow light/dark; nothing animates. */
+.twt-vod-offset {
+  color: var(--twt-faint);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  flex: 0 0 auto;
+}
+
+.twt-msg.twt-replay .twt-vod-chip {
+  font-size: 8px;
+  line-height: 1.5;
+  padding: 0 2px;
+}
+
+.twt-system {
+  padding: 1px 8px;
+  color: var(--twt-system);
+  font-size: 11px;
+}
+
+/* "previous messages": separates the prepended channel history from the live
+ * rows, so a scroll back up does not look like a broken timeline. */
+.twt-history-divider {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--twt-faint);
+  user-select: none;
+}
+
+.twt-history-divider::before,
+.twt-history-divider::after {
+  content: "";
+  flex: 1 1 auto;
+  height: 1px;
+  background: var(--twt-border);
+}
+
+.twt-overlay-panel .twt-history-divider {
+  padding: 2px 10px;
+}
+
+.twt-body {
+  position: relative;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* --------------------------------------------------------- settings fields */
+
+.twt-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 2px 0;
+}
+
+.twt-field > label {
+  flex: 1 1 auto;
+  color: var(--twt-dim);
+}
+
+.twt-field .twt-select {
+  flex: 0 0 auto;
+  max-width: 55%;
+}
+
+.twt-field input[type="checkbox"] {
+  flex: 0 0 auto;
+}
+
+/* ------------------------------------------------------------- the overlay */
+
+body.twt-overlay-body {
+  background: transparent;
+  font-size: 13px;
+}
+
+.twt-overlay-root {
+  position: absolute;
+  right: 12px;
+  top: 10%;
+  bottom: 10%;
+  width: 340px;
+  max-width: 45vw;
+  display: flex;
+  flex-direction: column;
+  color: var(--twt-fg);
+}
+
+.twt-overlay-panel {
+  position: relative;   /* anchors the eight resize zones */
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: var(--twt-overlay-panel);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  box-shadow: var(--twt-overlay-shadow);
+  overflow: hidden;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+.twt-overlay-panel .twt-messages {
+  padding: 6px 0;
+  /* Wheel/trackpad scrolling stops at the list end instead of chaining to the
+   * video underneath. */
+  overscroll-behavior: contain;
+}
+
+.twt-overlay-panel .twt-msg {
+  padding: 1px 10px;
+}
+
+/* ------------------------------------------------------ overlay affordances
+ *
+ * The header is the move area; the eight edge/corner zones are the resize
+ * affordances. They are always present - no hover reveal, no dwell - and are
+ * absolutely positioned inside the panel so they never change its size.
+ *
+ * IINA hands the webview a mouse event only where the topmost element under
+ * the pointer carries data-clickable (PluginOverlayView.hitTest ->
+ * elementFromPoint().dataset.clickable, no ancestor walk), so every decorative
+ * descendant is transparent to hit testing and only the reacting nodes are
+ * interactive: the header, the eight zones, #messages (wheel/scroll) and the
+ * jump chip. The panel itself is transparent too, so clicks on its gutters
+ * reach the video. Corners sit above edges (z-index), edges above the content.
+ */
+
+.twt-overlay-panel,
+.twt-overlay-panel * {
+  pointer-events: none;
+}
+
+.twt-overlay-panel #overlay-header,
+.twt-overlay-panel #messages,
+.twt-overlay-panel #jump-bottom,
+.twt-overlay-panel .twt-overlay-zone {
+  pointer-events: auto;
+}
+
+#overlay-header {
+  cursor: grab;
+}
+
+body.twt-overlay-moving,
+body.twt-overlay-moving #overlay-header {
+  cursor: grabbing;
+}
+
+/* The zones are invisible hit areas: they paint nothing (no background, no
+ * opacity wash) in every state. Their affordance is the directional resize
+ * cursor, which appears over each band/corner. */
+.twt-overlay-zone {
+  position: absolute;
+  z-index: 3;
+}
+
+.twt-overlay-edge-top {
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 7px;
+  cursor: ns-resize;
+}
+
+.twt-overlay-edge-right {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 7px;
+  cursor: ew-resize;
+}
+
+.twt-overlay-edge-bottom {
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 7px;
+  cursor: ns-resize;
+}
+
+.twt-overlay-edge-left {
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 7px;
+  cursor: ew-resize;
+}
+
+/* corners are 16 px squares above the bands */
+.twt-overlay-corner {
+  z-index: 4;
+  width: 16px;
+  height: 16px;
+}
+
+.twt-overlay-corner-tl { top: 0; left: 0; cursor: nwse-resize; }
+.twt-overlay-corner-tr { top: 0; right: 0; cursor: nesw-resize; }
+.twt-overlay-corner-bl { bottom: 0; left: 0; cursor: nesw-resize; }
+.twt-overlay-corner-br { bottom: 0; right: 0; cursor: nwse-resize; }
+
+/* Armed by ui/overlay-view.js for the duration of a drag or a resize only. */
+.twt-overlay-catcher {
+  display: none;
+  -webkit-user-select: none;
+  user-select: none;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 30;
+  cursor: grabbing;
+}
+
+/* Appears only while the reader is scrolled away from the bottom. */
+.twt-jump-bottom {
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  z-index: 2;
+  font: inherit;
+  font-size: 10px;
+  padding: 2px 8px;
+  border: 1px solid var(--twt-border);
+  border-radius: 10px;
+  background: var(--twt-input-bg);
+  color: var(--twt-fg);
+  cursor: pointer;
+  box-shadow: var(--twt-overlay-shadow);
+}
+
+body.twt-overlay-body.twt-hidden {
+  display: none;
+}

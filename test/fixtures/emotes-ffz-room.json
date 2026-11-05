@@ -1,0 +1,25 @@
+{
+  "room": {
+    "_id": 840214,
+    "id": "caedrel"
+  },
+  "sets": {
+    "840236": {
+      "id": 840236,
+      "emoticons": [
+        {
+          "id": 210748,
+          "name": "Pog",
+          "height": 28,
+          "width": 28
+        },
+        {
+          "id": 419215,
+          "name": "MEGALUL",
+          "height": 30,
+          "width": 32
+        }
+      ]
+    }
+  }
+}

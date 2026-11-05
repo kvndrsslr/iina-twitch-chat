@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Twitch - Help</title>
+  <style>
+    body {
+      font: 12px/1.5 -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, sans-serif;
+      margin: 12px;
+    }
+    h2 { font-size: 14px; margin: 18px 0 6px; }
+    h2:first-child { margin-top: 0; }
+    code, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    table { border-collapse: collapse; margin: 6px 0; }
+    th, td { text-align: left; padding: 2px 12px 2px 0; vertical-align: top; }
+    th { font-weight: 600; }
+    .secondary { color: rgba(128, 128, 128, 0.9); }
+    ul { margin: 4px 0 4px 18px; padding: 0; }
+  </style>
+</head>
+<body>
+  <h2>Twitch</h2>
+  <p>
+    Shows Twitch chat <strong>in the video overlay</strong>, always bound to the stream that is
+    playing, and browses Twitch from the <strong>Twitch</strong> sidebar tab. Configuration is
+    shared with <a href="https://github.com/xithrius/twitch-tui">twitch-tui</a>:
+    <code>~/.config/twt/config.toml</code> and <code>~/.config/twt/filters.txt</code>.
+    The plugin works with no configuration file at all, and chat is read-only: there is no
+    message composer.
+  </p>
+
+  <h2>Plugin menu</h2>
+  <p class="secondary">
+    IINA only shows the first five first-level items of a plugin menu, so the plugin uses four and
+    keeps the Config entries in the <strong>Config</strong> submenu.
+  </p>
+  <table>
+    <tr><th>Connect / Disconnect</th><td>Open or close the IRC connection.</td></tr>
+    <tr><th>Toggle Twitch Overlay <code>⌘⇧T</code></th><td>Show or hide the chat on top of the video.</td></tr>
+    <tr><th>Show Twitch Sidebar <code>⌘⇧B</code></th><td>Open IINA's sidebar on the Twitch tab.</td></tr>
+    <tr><th>Open Twitch Window <code>⌘⇧W</code></th><td>Open the standalone Twitch browser window; works with no media and no player window.</td></tr>
+    <tr><th>Config ▸ Reload Config</th><td>Re-read <code>config.toml</code> and <code>filters.txt</code>.</td></tr>
+    <tr><th>Config ▸ Open Config Folder</th><td>Reveal the folder of the config file that was found in the Finder.</td></tr>
+    <tr><th>Config ▸ Open Help / README</th><td>Open this page.</td></tr>
+  </table>
+
+  <p>
+    <strong>Known IINA behaviour.</strong> IINA rebuilds a plugin's menu (and its key equivalents)
+    only when the Plugin menu is opened, when a plugin asks for a rebuild, or once at the end of
+    app launch — not when a window becomes key or closes. While a non-player window is key,
+    including this plugin's standalone Twitch window, IINA falls back to the first player window,
+    so <em>Toggle Twitch Overlay</em> and <em>Show Twitch Sidebar</em> act on that window (or do
+    nothing if it is gone); <em>Open Twitch Window</em> (<code>⌘⇧W</code>) is global and keeps
+    working. Opening the Plugin menu once re-binds the per-player items to the window in front.
+  </p>
+
+  <h2>Standalone Twitch window</h2>
+  <p>
+    <strong>Plugin ▸ Open Twitch Window</strong> (<code>⌘⇧W</code>) opens the browser in IINA's
+    own standalone window. A sidebar cannot exist without a player window, so this is the way to
+    browse Twitch with nothing loaded. It is browse-only: the five browse tabs, no chat (the IRC
+    client needs a player channel) and no Settings pane. Channel and category rows navigate inside
+    the window; the <em>Watch</em> button and VOD rows open a new player window, since there is no
+    current player to load into.
+  </p>
+  <p>
+    With the <strong>Startup</strong> preference <code>auto_open_browser</code> on (default off),
+    the window opens itself once per launch when IINA starts with nothing playing: it waits about
+    2.5 seconds, does not open if media arrives during that window (opening a file or a restored
+    session cancels it), and leaves an already-open window alone. <code>⌘⇧W</code> opens it
+    manually in any state; the switch takes effect on the next launch.
+  </p>
+
+  <h2>Switching streams</h2>
+  <p>
+    Opening a stream/VOD into the current window replaces the media through
+    <code>mpv loadfile … replace</code>, so IINA's <em>Loading Media…</em> window does not appear.
+    IINA's own title/history/“now playing” bookkeeping does not update for that load. If the load
+    fails, the plugin notices after a short grace period, shows
+    <em>the URL could not be opened</em> and releases the channel so chat goes idle instead of
+    showing the previous stream. Opening in a new window still uses IINA's loader.
+  </p>
+
+  <h2>Where chat appears</h2>
+  <ul>
+    <li><strong>Only in the video overlay.</strong> It has a one-line connection/channel header and
+      the message list, with no chat controls, so the video keeps every mouse event outside the
+      panel.</li>
+    <li><strong>Only on a Twitch video.</strong> The panel is shown while chat is bound to the
+      playing media, so any other video leaves it hidden; <strong>⌘⇧T</strong> then reports
+      <em>Twitch Chat is only available on Twitch videos</em>. The visibility preference is kept,
+      so the overlay returns with the next Twitch stream.</li>
+    <li>The sidebar does not show chat, has no composer, no message list and no channel switcher.
+      Its web view still hosts the IRC connection in the background, so chat keeps flowing while
+      the overlay is hidden.</li>
+    <li>The panel itself responds to the mouse (its header for moving, its edges and corners for
+      resizing, and scrolling); everything outside it stays click-through.</li>
+  </ul>
+
+  <h2>Chat follows the stream</h2>
+  <p>
+    Chat is bound to the channel the plugin detects in the media that is playing:
+  </p>
+  <ul>
+    <li>A <code>twitch.tv/&lt;login&gt;</code> URL anywhere in the video URL, the mpv
+      <code>path</code>/<code>filename</code>/<code>media-title</code> or a playlist entry wins —
+      including the <code>m.</code>, <code>go.</code> and <code>player.</code> forms and
+      <code>player.twitch.tv/?channel=&lt;login&gt;</code>. Reserved paths such as
+      <code>videos</code>, <code>clips</code>, <code>directory</code> and <code>settings</code> are
+      skipped.</li>
+    <li>Only when no URL matches is the <em>title</em> used as a fallback, and only when the same
+      media is demonstrably Twitch-sourced (<code>twitch.tv</code>, <code>ttvnw.net</code> or
+      <code>twitch.com</code> in the URL, path, file name or media title):
+      <code>ohnePixel — VITY vs LOUD [GRAND FINAL]</code> becomes <code>#ohnepixel</code>, while a
+      YouTube video called <code>Bob - highlights</code> never joins <code>#bob</code>, and titles
+      that reduce to a stopword (<code>vod</code>, <code>live</code>, <code>highlights</code>, …)
+      are rejected.</li>
+    <li><em>Detect the channel of the playing video</em> (<code>auto_join</code>, on by default) is
+      the only switch. With it off the plugin never joins automatically. Detection itself is always
+      automatic: it runs on every file load.</li>
+    <li>There is no config channel, no manual join and no remembered channel. A video without a
+      Twitch channel releases the previous one and chat goes idle. Each newly loaded file
+      re-evaluates the choice.</li>
+    <li>The plugin announces the join with
+      <code>Twitch: joined #&lt;login&gt; (from the playing video)</code> and logs one decision line
+      (<code>channel decision: detected #x from …</code>). The overlay header shows
+      <code>#&lt;channel&gt;</code>.</li>
+    <li>Limitation: a <code>twitch.tv/videos/&lt;id&gt;</code> VOD URL carries no channel name, so
+      there the title heuristic is the only signal for binding live chat.</li>
+  </ul>
+
+  <h2>Sidebar: browse and settings</h2>
+  <p>
+    The sidebar has six tabs: <strong>Following</strong>, <strong>Top</strong>,
+    <strong>Categories</strong>, <strong>Search</strong>, <strong>Videos</strong> and
+    <strong>Settings</strong>. Browsing needs an OAuth token (the plugin's API proxy has no
+    anonymous mode); without one the pane shows a <em>No token</em> explanation with
+    <em>Retry</em>. Following additionally needs <code>user:read:follows</code> and Videos uses
+    the same followed-channel list.
+  </p>
+  <ul>
+    <li>Each tab keeps its own history, its own loaded data and its own search text. Switching
+      tabs neither reloads nor refetches; <em>Back</em> and Escape pop only the active tab's
+      history, and the refresh button refetches only the active tab. The tab strip scrolls
+      sideways rather than wrapping.</li>
+    <li><strong>Following</strong>: live channels first by viewer count (highest first, ties by
+      name), then offline channels by name A→Z. The comparison is case-insensitive and applied to
+      the whole accumulated list, so pagination cannot leave an unsorted tail.</li>
+    <li><strong>Top</strong>: Twitch's top live streams. A row opens the channel page; its
+      <em>Watch</em> button opens the stream.</li>
+    <li><strong>Categories</strong>: Twitch's top categories, with a search field
+      (<code>/helix/search/categories</code>). Category rows show no viewer count — the
+      <code>/helix/games/top</code> payload has none and there is no bounded API call that yields
+      a category total — and keep Twitch's own popularity order. Opening one lists its live
+      streams.</li>
+    <li><strong>Search</strong>: channel search (<code>/helix/search/channels</code>). A result
+      opens the channel page, whose Videos section holds that channel's VODs.</li>
+    <li><strong>Videos</strong>: recent videos from the channels you follow, newest first, with a
+      filter over title, channel name and login. The filter only ever considers these recent
+      videos — typing a channel name never pulls that channel's videos through a channel search.
+      Helix has <strong>no VOD text search</strong>, so this is not a search of all of Twitch.</li>
+    <li>A VOD whose thumbnail is missing/empty or still processing
+      (<code>_404/404_processing_</code>, never requested) uses the live stream's thumbnail while
+      the channel is broadcasting, otherwise a placeholder. If a Twitch-hosted VOD thumbnail still
+      fails to load, the box swaps once to the live preview when one is available, then gives up.
+      Images are only loaded from Twitch's own image hosts.</li>
+    <li>A VOD row, or the <em>Watch</em> button on a live row, opens the stream/video in the
+      current player window; <strong>⌘-click</strong> or <strong>middle-click</strong> opens it in
+      a new player window. Clicking a channel/category row navigates inside the sidebar. Playback
+      itself is resolved by IINA/yt-dlp/streamlink.</li>
+    <li>The connection indicator is a pinned footer at the bottom of the sidebar; only the tab
+      content scrolls.</li>
+    <li><strong>Settings</strong> — palette, theme, timestamps and format, usernames, mention
+      highlighting, badges, channel title, the four emote toggles, message cap, render delay and the
+      message/username filter switches. Every control defaults to “Use config”.</li>
+    <li>The same overrides are also in IINA → Settings → Twitch.</li>
+  </ul>
+
+  <h2>Chat history</h2>
+  <p>
+    The plugin keeps the last 50 messages of each channel (up to 20 channels, at most 512 KB) in its
+    data folder, so a channel you return to is not empty. Returning to a channel shows those
+    messages above the live ones. With <em>Pre-fill the last 50 messages from a community
+    recent-messages service</em> enabled (default off), a channel visited for the first time is
+    pre-filled from <code>recent-messages.robotty.de</code>; that request carries only the public
+    channel name, never your OAuth token. Twitch itself offers no chat-history API.
+  </p>
+
+  <h2>VOD chat replay</h2>
+  <p>
+    A VOD's chat is replayed from Twitch's <strong>undocumented GQL endpoint</strong>
+    (<code>VideoCommentsByOffsetOrCursor</code>, public web client id
+    <code>kimne78kx3ncx6brgo4mv6wki5h1ko</code>, no <code>Authorization</code> header). There is
+    no supported Twitch API for VOD chat. Comments are fetched forward from the playhead (first by
+    offset stepping - the next request starts just past the newest comment of the last page,
+    which overlaps the pages and is deduped by comment id), only one request is in flight at a time and requests are at least
+    250 ms apart; a backwards seek or a jump of more than 15 s forward resets the buffer and
+    refetches. A 1 s tick emits comments as the playhead reaches them. Live chat is suppressed
+    while a VOD plays, the overlay is cleared when replay starts and stops, and the IRC socket
+    stays connected for room-id and emote sets. <code>vod_chat_replay</code> (on by default)
+    disables the replay; when it fails you get one warning, the OSD
+    <code>VOD chat replay unavailable</code>, and no chat — the plugin stays in VOD mode so live
+    chat cannot leak in, and a seek retries. This uses an undocumented endpoint, so it may stop
+    working if Twitch changes it.
+  </p>
+  <p>
+    A replayed comment shows one time: the offset into the VOD (for example <code>10:18</code>),
+    the point in the broadcast where it was originally sent. The original wall-clock time is not
+    recoverable from the data the plugin has — a replay event carries only the offset, and its
+    timestamp is the replay moment — so the offset is the canonical original time. Live rows keep
+    their own single timestamp.
+  </p>
+
+  <h2>Overlay layout</h2>
+  <p>
+    The overlay is moved and resized directly, with nothing to reveal and nothing that appears or
+    disappears:
+  </p>
+  <ul>
+    <li><strong>Move</strong> — drag the panel by its <strong>header</strong>. There is no handle:
+      the cursor becomes a grab hand over the header and a closed hand while you drag.</li>
+    <li><strong>Resize</strong> — drag any <strong>edge or corner</strong>. Each one shows its
+      directional cursor (the zones themselves are invisible; the cursor is the only
+      affordance). Interacting with the controls never changes the overlay's size.</li>
+    <li><strong>Anchoring</strong> — the panel remembers which corner of the video it is nearest
+      to, so a resized video window keeps its distances. It only switches corners once the panel's
+      centre passes the video centre by a margin (10 % of the viewport on that axis), so it does
+      not flip while you nudge it across the middle. Resizing keeps the anchored edges still and
+      moves only the edge(s) you drag, with a 220 × 120 minimum and the panel always inside the
+      video.</li>
+    <li><strong>Escape</strong> cancels a drag or resize; the layout is saved per channel.</li>
+  </ul>
+  <p>
+    The panel (and only the panel) responds to the mouse while the overlay is visible; everything
+    outside it is click-through, so the video keeps every other mouse event. The overlay reports
+    the geometry while a gesture is in flight and the plugin stores each report immediately,
+    writing the preference once the gesture pauses.
+  </p>
+  <p>
+    The arrangement is remembered <strong>per channel</strong> — the channel it was arranged in is
+    the one it is restored for, and with no channel bound it is stored as <code>default</code>. The
+    most recent 50 channels are kept. The stored layouts live in the
+    <code>overlay_layouts</code> preference (IINA → Settings → Twitch); a missing or unreadable
+    value falls back to the default position. An older <code>{x, y, w, h}</code> layout is still
+    read as the top-left anchored position and rewritten in the new anchored shape on the next
+    save; a stale <code>overlay_layout_locked</code> key is ignored. The bundle identifier is
+    unchanged, so existing preferences and cached chat history survive the rename.
+  </p>
+
+  <h2>Tokens</h2>
+  <p>
+    A token is optional: chat connects anonymously and read-only without one. When present (from
+    <code>[twitch] token</code> in <code>config.toml</code>, or the token you save in IINA → Settings
+    → Twitch, stored in the macOS Keychain), it authenticates the IRC connection and lets the
+    sidebar use Twitch's API. The plugin validates it itself and <strong>no web view makes Twitch
+    API calls directly</strong>: the sidebar asks the plugin, which adds the credentials, and only
+    an allow-list of Helix paths plus <code>/identity</code> is served. The token is never shown in the
+    Twitch browser, never sent to the overlay and never logged.
+  </p>
+
+  <h2>Full documentation</h2>
+  <p>
+    The <a href="../README.md">README</a> that ships with the plugin documents the exact
+    twitch-tui field mapping, every preference, the plugin's message protocol and the build
+    targets. The plugin folder is revealed by <em>Open Help / README</em> in the Plugin menu.
+  </p>
+
+  <h2>Troubleshooting</h2>
+  <ul>
+    <li><strong>Window → Log Viewer</strong> shows everything the plugin logs (<code>global - Twitch</code> and <code>player… - Twitch</code>).</li>
+    <li><strong>Plugin → Developer Tool</strong> (IINA 1.4+) evaluates JavaScript in the plugin's context.</li>
+    <li><strong>No chat / nothing joins:</strong> the playing video must carry a Twitch channel (URL,
+      path or Twitch-sourced title). Detection runs on every file load; the log line
+      <code>channel decision: …</code> says what was found. Check that
+      <code>auto_join</code> is on.</li>
+    <li><strong>Following is empty or explains a missing permission:</strong> the saved token needs
+      the <code>user:read:follows</code> scope. Re-authorise the token and press *Retry*.</li>
+    <li><strong>A new player window does not open:</strong> IINA must expose its global entry
+      (<code>iina.global.createPlayerInstance</code>); the log says
+      <code>no global entry in this build</code> otherwise. Stream playback also needs yt-dlp or
+      streamlink configured in IINA.</li>
+    <li><strong>VOD chat is empty:</strong> VOD replay uses Twitch's undocumented endpoint and can
+      fail without notice; check that <code>vod_chat_replay</code> is on.</li>
+    <li>Third-party emotes need their toggles on <em>and</em> the plugin's network permission for
+      the API hosts <code>api.betterttv.net</code>, <code>7tv.io</code> (and
+      <code>api.7tv.app</code>) and <code>api.frankerfacez.com</code>, plus the image CDNs
+      <code>cdn.betterttv.net</code>, <code>cdn.7tv.app</code> and
+      <code>cdn.frankerfacez.com</code>.</li>
+    <li>Badges, Twitch emotes and the IRC endpoint need <code>*.jtvnw.net</code>,
+      <code>*.twitch.tv</code> and <code>irc-ws.chat.twitch.tv</code>; the Twitch API proxy also
+      uses <code>api.twitch.tv</code> and <code>id.twitch.tv</code> (both covered by
+      <code>*.twitch.tv</code>).</li>
+  </ul>
+</body>
+</html>

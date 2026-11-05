@@ -1,0 +1,52 @@
+{
+  "name": "Twitch",
+  "version": "1.5.0",
+  "identifier": "com.kdressler.iina-twitch-chat",
+  "author": {
+    "name": "iina-twitch-chat"
+  },
+  "description": "Show Twitch chat over the video, always bound to the stream that is playing, and browse Twitch from the sidebar. Reads its configuration from twitch-tui (~/.config/twt) and works read-only without an OAuth token.",
+  "entry": "main.js",
+  "globalEntry": "global.js",
+  "preferencesPage": "ui/preferences.html",
+  "helpPage": "ui/help.html",
+  "sidebarTab": {
+    "name": "Twitch"
+  },
+  "permissions": [
+    "show-osd",
+    "video-overlay",
+    "file-system",
+    "network-request"
+  ],
+  "allowedDomains": [
+    "irc-ws.chat.twitch.tv",
+    "twitch.tv",
+    "*.twitch.tv",
+    "*.jtvnw.net",
+    "api.betterttv.net",
+    "cdn.betterttv.net",
+    "7tv.io",
+    "api.7tv.app",
+    "cdn.7tv.app",
+    "api.frankerfacez.com",
+    "cdn.frankerfacez.com",
+    "recent-messages.robotty.de"
+  ],
+  "preferenceDefaults": {
+    "config_file": "",
+    "ui_overrides": "",
+    "overlay_visible": false,
+    "auto_open_browser": false,
+    "overlay_layouts": "",
+    "auto_join": true,
+    "token_input": "",
+    "command_request": "",
+    "command_seq": 0,
+    "status_line": "",
+    "token_status": "",
+    "filters_status": "",
+    "vod_chat_replay": true,
+    "history_remote": false
+  }
+}

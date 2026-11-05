@@ -1,0 +1,9 @@
+# Newer nested filters form: per-kind configuration.
+[filters.message]
+enabled = true
+reversed = true
+filters = ["^spam", "naughty"]
+
+[filters.username]
+path = "test/fixtures/username_filters.txt"
+enabled = false

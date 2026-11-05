@@ -1,0 +1,3 @@
+# username filters loaded through [filters.username].path
+not-good
+^bot

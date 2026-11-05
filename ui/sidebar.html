@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Twitch</title>
+  <link rel="stylesheet" href="chat.css">
+  <link rel="stylesheet" href="browser.css">
+</head>
+<body>
+  <div class="twt-root">
+    <header class="twt-header">
+      <div class="twt-header-row">
+        <div id="tab-strip" class="twt-tabs" role="tablist">
+          <button id="tab-following" class="twt-tab twt-tab-active" type="button" role="tab">Following</button>
+          <button id="tab-top" class="twt-tab" type="button" role="tab">Top</button>
+          <button id="tab-categories" class="twt-tab" type="button" role="tab">Categories</button>
+          <button id="tab-search" class="twt-tab" type="button" role="tab">Search</button>
+          <button id="tab-videos" class="twt-tab" type="button" role="tab">Videos</button>
+          <button id="tab-settings" class="twt-tab" type="button" role="tab">Settings</button>
+        </div>
+      </div>
+      <div class="twt-nav">
+        <button id="browser-back" class="twt-icon-btn" type="button" title="Back" hidden>‹</button>
+        <span id="browser-title" class="twt-nav-title">Following</span>
+        <span class="twt-spacer"></span>
+        <button id="browser-refresh" class="twt-icon-btn" type="button" title="Refresh">⟳</button>
+      </div>
+    </header>
+
+    <section id="pane-following" class="twt-pane"></section>
+    <section id="pane-top" class="twt-pane" hidden></section>
+    <section id="pane-categories" class="twt-pane" hidden></section>
+    <section id="pane-search" class="twt-pane" hidden></section>
+    <section id="pane-videos" class="twt-pane" hidden></section>
+
+    <section id="pane-settings" class="twt-pane twt-settings" hidden>
+      <div class="twt-field">
+        <label for="p-palette">Palette</label>
+        <select id="p-palette" class="twt-select" data-override="palette" data-kind="string"></select>
+      </div>
+      <div class="twt-field">
+        <label for="p-theme">Theme</label>
+        <select id="p-theme" class="twt-select" data-override="theme" data-kind="string"></select>
+      </div>
+
+      <h3>Messages</h3>
+      <div class="twt-field">
+        <label for="p-showDatetimes">Timestamps</label>
+        <select id="p-showDatetimes" class="twt-select" data-override="showDatetimes" data-kind="bool"></select>
+      </div>
+      <div class="twt-field">
+        <label for="p-datetimeFormat">Timestamp format</label>
+        <input id="p-datetimeFormat" class="twt-input" type="text" data-override="datetimeFormat" data-kind="text" placeholder="use config">
+      </div>
+      <div class="twt-field">
+        <label for="p-usernameShown">Usernames</label>
+        <select id="p-usernameShown" class="twt-select" data-override="usernameShown" data-kind="bool"></select>
+      </div>
+      <div class="twt-field">
+        <label for="p-usernameHighlight">Highlight mentions</label>
+        <select id="p-usernameHighlight" class="twt-select" data-override="usernameHighlight" data-kind="bool"></select>
+      </div>
+      <div class="twt-field">
+        <label for="p-badges">Badges</label>
+        <select id="p-badges" class="twt-select" data-override="badges" data-kind="bool"></select>
+      </div>
+      <div class="twt-field">
+        <label for="p-titleShown">Channel title</label>
+        <select id="p-titleShown" class="twt-select" data-override="titleShown" data-kind="bool"></select>
+      </div>
+
+      <h3>Emotes</h3>
+      <div class="twt-field">
+        <label for="p-twitchEmotes">Twitch emotes</label>
+        <select id="p-twitchEmotes" class="twt-select" data-override="twitchEmotes" data-kind="bool"></select>
+      </div>
+      <div class="twt-field">
+        <label for="p-betterttvEmotes">BetterTTV</label>
+        <select id="p-betterttvEmotes" class="twt-select" data-override="betterttvEmotes" data-kind="bool"></select>
+      </div>
+      <div class="twt-field">
+        <label for="p-seventvEmotes">7TV</label>
+        <select id="p-seventvEmotes" class="twt-select" data-override="seventvEmotes" data-kind="bool"></select>
+      </div>
+      <div class="twt-field">
+        <label for="p-frankerfacezEmotes">FrankerFaceZ</label>
+        <select id="p-frankerfacezEmotes" class="twt-select" data-override="frankerfacezEmotes" data-kind="bool"></select>
+      </div>
+
+      <h3>Buffering</h3>
+      <div class="twt-field">
+        <label for="p-maxMessages">Maximum messages</label>
+        <input id="p-maxMessages" class="twt-input" type="text" data-override="maxMessages" data-kind="text" placeholder="use config">
+      </div>
+      <div class="twt-field">
+        <label for="p-delay">Render delay (ms)</label>
+        <input id="p-delay" class="twt-input" type="text" data-override="delay" data-kind="text" placeholder="use config">
+      </div>
+
+      <h3>Filters</h3>
+      <div class="twt-field">
+        <label for="p-filter-message">Message filter</label>
+        <select id="p-filter-message" class="twt-select" data-filter="message"></select>
+      </div>
+      <div class="twt-field">
+        <label for="p-filter-username">Username filter</label>
+        <select id="p-filter-username" class="twt-select" data-filter="username"></select>
+      </div>
+      <div id="filter-summary" class="twt-note"></div>
+      <div class="twt-field">
+        <button id="p-reset" class="twt-btn" type="button">Reset all to config</button>
+      </div>
+      <div id="config-summary" class="twt-note"></div>
+    </section>
+
+    <footer id="status-bar" class="twt-status-bar">
+      <span id="status-dot" class="twt-dot" data-state="idle"></span>
+      <span id="status-text" class="twt-status">starting…</span>
+    </footer>
+  </div>
+
+  <script src="../lib/irc.js"></script>
+  <script src="../lib/config.js"></script>
+  <script src="../lib/emotes.js"></script>
+  <script src="../lib/strftime.js"></script>
+  <script src="protocol.js"></script>
+  <script src="browser.js"></script>
+  <script src="transport.js"></script>
+</body>
+</html>

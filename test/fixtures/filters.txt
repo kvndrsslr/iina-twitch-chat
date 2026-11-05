@@ -1,0 +1,5 @@
+# filters.txt: one filter per line, "#" comment lines and blank lines skipped
+^bad
+Kappa
+[Vv]ip
+naughty_(

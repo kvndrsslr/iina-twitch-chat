@@ -1,0 +1,31 @@
+{
+  "id": "01GD17VE2R000E0RPNH2V9Z16G",
+  "name": "Halloween Global Emotes",
+  "emotes": [
+    {
+      "id": "01FGH8NE3800064MEQW00DNBNG",
+      "name": "reckH",
+      "flags": 0,
+      "tags": [],
+      "data": {
+        "id": "01FGH8NE3800064MEQW00DNBNG",
+        "name": "reckH",
+        "listed": true,
+        "animated": false
+      }
+    },
+    {
+      "id": "01FSNK0GP000038GDBZ91HT6SQ",
+      "name": "PETPET",
+      "flags": 1,
+      "tags": [],
+      "data": {
+        "id": "01FSNK0GP000038GDBZ91HT6SQ",
+        "name": "PETPET",
+        "listed": true,
+        "animated": true
+      }
+    }
+  ],
+  "emote_count": 45
+}

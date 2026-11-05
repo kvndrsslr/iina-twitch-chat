@@ -1,0 +1,35 @@
+{
+  "id": "5b8d2b719779e362c9cbad56",
+  "channelEmotes": [
+    {
+      "id": "5f96dcb6710f8302f0c92f62",
+      "code": "caedJAMMER",
+      "imageType": "gif",
+      "animated": true,
+      "userId": "5b8d2b719779e362c9cbad56"
+    },
+    {
+      "id": "600f0c62df6a0665f2750d8a",
+      "code": "caedJAM",
+      "imageType": "gif",
+      "animated": true,
+      "userId": "5b8d2b719779e362c9cbad56"
+    }
+  ],
+  "sharedEmotes": [
+    {
+      "id": "55898e122612142e6aaa935b",
+      "code": "PepePls",
+      "imageType": "gif",
+      "animated": true,
+      "width": 21,
+      "height": 28,
+      "user": {
+        "id": "5537fb2b236a1aa17a9970df",
+        "name": "emjaykae",
+        "displayName": "EmJayKae",
+        "providerId": "23473656"
+      }
+    }
+  ]
+}

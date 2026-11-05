@@ -1,0 +1,65 @@
+# iina-twitch test configuration, copied in spirit from twitch-tui's default-config.toml
+[twitch]
+# Your username from Twitch.
+username = "testbot"
+# The streamer's username.
+channel = "dallas"
+# The websocket server to connect to (an irc-ws endpoint -> honoured verbatim).
+server = "wss://irc-ws.chat.twitch.tv:443"
+# Access token for authenticated chat.
+token = ""
+
+[terminal]
+# The delay in milliseconds between terminal updates.
+delay = 45
+# The maximum amount of messages that can be rendered.
+maximum_messages = 300
+# The file to put logs in.
+log_file = ""
+log_level = "info"
+first_state = "dashboard"
+
+[storage]
+# If previous channels switched to should be tracked.
+channels = true
+# If previous username mentions should be tracked.
+mentions = false
+chatters = false
+
+[filters]
+# If filters should be enabled.
+enabled = true
+# If the regex filters should be reversed.
+reversed = false
+
+[frontend]
+# If the time and date is to be shown in the chat window.
+show_datetimes = true
+# The format of string that will show up in the terminal.
+datetime_format = "%a %b %e %T %Y"
+# If usernames should be shown in the chat window.
+username_shown = true
+# The color palette for usernames. Options: pastel, vibrant, warm, cool.
+palette = "vibrant"
+# Show the title values at the top of the terminal.
+title_shown = true
+margin = 0
+# Show twitch badges next to usernames.
+badges = true
+# Color theme, being either light or dark.
+theme = "light"
+# If your username should be highlighted when it appears in chat.
+username_highlight = false
+state_tabs = false
+# If Twitch emotes should be displayed.
+twitch_emotes = true
+betterttv_emotes = false
+seventv_emotes = false
+frankerfacez_emotes = false
+# Channel names to always be displayed on the start screen.
+# Multi-line array with a trailing comma and a comment.
+favorite_channels = [
+  "placeholder_channel",
+  "another_channel", # trailing comma comment
+]
+recent_channel_count = 5

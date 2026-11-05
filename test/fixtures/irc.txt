@@ -1,0 +1,11 @@
+@badge-info=;badges=broadcaster/1;color=#0000FF;display-name=Forstycup;emotes=25:0-4,12-16/1902:6-10;first-msg=1;id=a1b2c3;mod=0;room-id=713936733;subscriber=0;tmi-sent-ts=1643904084794;turbo=0;user-id=713936733;user-type= :forstycup!forstycup@forstycup.tmi.twitch.tv PRIVMSG #dallas :Kappa Keepo Kappa
+@badge-info=;badges=subscriber/6,moderator/1;color=;display-name=FooBar;emotes=62835:0-10;first-msg=0;id=c3d4e5;mod=1;room-id=123;subscriber=1;tmi-sent-ts=1643904085000;turbo=1;user-id=987;user-type=mod :foobar!foobar@foobar.tmi.twitch.tv PRIVMSG #dallas :bleedPurple
+@badge-info=;badges=broadcaster/1,bits/1000;bits=100;color=#FF4500;display-name=BitsGuy;emotes=;first-msg=0;id=e5f6a7;mod=0;room-id=123;subscriber=0;tmi-sent-ts=1643904086000;turbo=0;user-id=555;user-type= :bitsguy!bitsguy@bitsguy.tmi.twitch.tv PRIVMSG #dallas :cheer100
+@color=#00FF00;display-name=ActionGuy;emotes=25:8-12;first-msg=0;id=77aa88;mod=0;room-id=123;subscriber=0;tmi-sent-ts=1643904087000;turbo=0;user-id=666;user-type= :actionguy!actionguy@actionguy.tmi.twitch.tv PRIVMSG #dallas :ACTION Kappa keeps you going
+@msg-id=subgift;room-id=123;tmi-sent-ts=1643904088000 :tmi.twitch.tv USERNOTICE #dallas :Gifted a sub!
+@login=ronni;room-id=123;tmi-sent-ts=1643904089000 :tmi.twitch.tv NOTICE #dallas :The message from foo is now deleted.
+@ban-duration=350;room-id=123;tmi-sent-ts=1643904090000 :tmi.twitch.tv CLEARCHAT #dallas :ronni
+@login=foo;room-id=123;target-msg-id=94e6c7ff-0000-0000-0000-000000000000;tmi-sent-ts=1643904091000 :tmi.twitch.tv CLEARMSG #bar :what a great day
+@emote-only=0;followers-only=-1;r9k=0;room-id=123;slow=10;subs-only=1 :tmi.twitch.tv ROOMSTATE #dallas
+PING :tmi.twitch.tv
+:tmi.twitch.tv RECONNECT

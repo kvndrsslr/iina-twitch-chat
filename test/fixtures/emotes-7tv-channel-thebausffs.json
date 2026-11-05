@@ -1,0 +1,42 @@
+{
+  "id": "93869876",
+  "platform": "TWITCH",
+  "username": "thebausffs",
+  "emote_set": {
+    "id": "01HBFQCZ6R000EE79BCJA0TXN2",
+    "name": "Thebausffs's Emotes",
+    "emotes": [
+      {
+        "id": "01HBFQCZ6R000EE79BCJA0TXN2",
+        "name": "o7",
+        "flags": 0,
+        "data": {
+          "id": "01HBFQCZ6R000EE79BCJA0TXN2",
+          "name": "o7",
+          "animated": false
+        }
+      },
+      {
+        "id": "01J9RAE09G000E6PR9GTQ931HH",
+        "name": "ta",
+        "flags": 0,
+        "data": {
+          "id": "01J9RAE09G000E6PR9GTQ931HH",
+          "name": "ta",
+          "animated": false
+        }
+      },
+      {
+        "id": "01HZ7B6QH0000A5M5H6B6H6B6H",
+        "name": "frfr",
+        "flags": 0,
+        "data": {
+          "id": "01HZ7B6QH0000A5M5H6B6H6B6H",
+          "name": "frfr",
+          "animated": false
+        }
+      }
+    ],
+    "emote_count": 996
+  }
+}

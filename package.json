@@ -1,0 +1,9 @@
+{
+  "name": "iina-twitch-chat",
+  "private": true,
+  "version": "1.5.0",
+  "description": "Pure-logic modules for Twitch, the IINA plugin",
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  }
+}

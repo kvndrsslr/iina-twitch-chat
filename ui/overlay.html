@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Twitch Overlay</title>
+  <link rel="stylesheet" href="chat.css">
+</head>
+<body class="twt-overlay-body">
+  <div id="overlay-root" class="twt-overlay-root">
+    <div id="overlay-panel" class="twt-overlay-panel">
+      <!-- No hover reveal: the header is the move area and the eight
+           edge/corner zones are the resize affordances, all always active.
+           IINA hit tests the topmost element carrying data-clickable, so these
+           nodes carry it for as long as the overlay is shown and everything
+           decorative inside the panel stays pointer-events: none. -->
+      <div id="overlay-header" class="twt-header">
+        <div class="twt-header-row">
+          <span id="status-dot" class="twt-dot" data-state="idle"></span>
+          <span id="header-channel" class="twt-channel">Twitch</span>
+          <span id="status-text" class="twt-status"></span>
+        </div>
+      </div>
+
+      <div class="twt-body">
+        <div id="messages" class="twt-messages"></div>
+        <button id="jump-bottom" class="twt-jump-bottom" type="button" hidden>Jump to latest</button>
+      </div>
+
+      <!-- Resize zones, absolutely positioned inside the panel (the corners
+           come after the edges so they win where they overlap). -->
+      <div id="overlay-edge-top" class="twt-overlay-zone twt-overlay-edge twt-overlay-edge-top" data-dir="top"></div>
+      <div id="overlay-edge-right" class="twt-overlay-zone twt-overlay-edge twt-overlay-edge-right" data-dir="right"></div>
+      <div id="overlay-edge-bottom" class="twt-overlay-zone twt-overlay-edge twt-overlay-edge-bottom" data-dir="bottom"></div>
+      <div id="overlay-edge-left" class="twt-overlay-zone twt-overlay-edge twt-overlay-edge-left" data-dir="left"></div>
+
+      <div id="overlay-corner-tl" class="twt-overlay-zone twt-overlay-corner twt-overlay-corner-tl" data-dir="tl"></div>
+      <div id="overlay-corner-tr" class="twt-overlay-zone twt-overlay-corner twt-overlay-corner-tr" data-dir="tr"></div>
+      <div id="overlay-corner-bl" class="twt-overlay-zone twt-overlay-corner twt-overlay-corner-bl" data-dir="bl"></div>
+      <div id="overlay-corner-br" class="twt-overlay-zone twt-overlay-corner twt-overlay-corner-br" data-dir="br"></div>
+    </div>
+  </div>
+
+  <!-- Armed only while a drag or a resize is in flight: IINA hit tests with
+       document.elementFromPoint(), so without a full-viewport element that
+       carries data-clickable the web view stops receiving mouse events as soon
+       as the pointer leaves the affordance it started on. -->
+  <div id="overlay-catcher" class="twt-overlay-catcher"></div>
+
+  <script src="../lib/irc.js"></script>
+  <script src="../lib/config.js"></script>
+  <script src="../lib/emotes.js"></script>
+  <script src="../lib/strftime.js"></script>
+  <script src="protocol.js"></script>
+  <script src="chat-view.js"></script>
+  <script src="overlay-view.js"></script>
+</body>
+</html>

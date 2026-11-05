@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Twitch</title>
+  <link rel="stylesheet" href="chat.css">
+  <link rel="stylesheet" href="browser.css">
+</head>
+<body>
+  <!-- The standalone browser window. It is the same ui/browser.js as the
+       sidebar's browse tabs, with two deliberate differences:
+         * no Settings pane (settings live in IINA's plugin settings page and in
+           the sidebar), so ui/browser.js skips that tab entirely;
+         * no ui/transport.js - the IRC client owns the plugin's only WebSocket
+           and binds a channel, which a standalone window cannot have. -->
+  <div class="twt-root">
+    <header class="twt-header">
+      <div class="twt-header-row">
+        <div id="tab-strip" class="twt-tabs" role="tablist">
+          <button id="tab-following" class="twt-tab twt-tab-active" type="button" role="tab">Following</button>
+          <button id="tab-top" class="twt-tab" type="button" role="tab">Top</button>
+          <button id="tab-categories" class="twt-tab" type="button" role="tab">Categories</button>
+          <button id="tab-search" class="twt-tab" type="button" role="tab">Search</button>
+          <button id="tab-videos" class="twt-tab" type="button" role="tab">Videos</button>
+        </div>
+      </div>
+      <div class="twt-nav">
+        <button id="browser-back" class="twt-icon-btn" type="button" title="Back" hidden>‹</button>
+        <span id="browser-title" class="twt-nav-title">Following</span>
+        <span class="twt-spacer"></span>
+        <button id="browser-refresh" class="twt-icon-btn" type="button" title="Refresh">⟳</button>
+      </div>
+    </header>
+
+    <section id="pane-following" class="twt-pane"></section>
+    <section id="pane-top" class="twt-pane" hidden></section>
+    <section id="pane-categories" class="twt-pane" hidden></section>
+    <section id="pane-search" class="twt-pane" hidden></section>
+    <section id="pane-videos" class="twt-pane" hidden></section>
+
+    <!-- no connection here: ui/browser.js keeps this neutral (it never writes a
+         channel, and "connected as ..." only ever comes from ui/transport.js,
+         which this page does not load) -->
+    <footer id="status-bar" class="twt-status-bar">
+      <span id="status-dot" class="twt-dot" data-state="idle"></span>
+      <span id="status-text" class="twt-status">browsing</span>
+    </footer>
+  </div>
+
+  <!-- Only the two scripts this page actually runs. ui/browser.js reads one
+       global, TwitchProtocol (ui/protocol.js), and nothing from lib/: it has no
+       reference to TwitchPlugin at all, so the IRC client (lib/irc.js), the
+       config defaults (lib/config.js), the emote helpers (lib/emotes.js) and
+       the time formatter (lib/strftime.js) would be dead weight here - the
+       sidebar loads them for ui/transport.js and the chat renderers. Note also
+       that ui/transport.js is deliberately absent: the IRC client owns the
+       plugin's only WebSocket and binds a channel, which a standalone window
+       cannot have. -->
+  <script src="protocol.js"></script>
+  <script src="browser.js"></script>
+</body>
+</html>

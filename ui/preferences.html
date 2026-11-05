@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Twitch</title>
+  <style>
+    body { padding: 0; }
+    .row { display: flex; align-items: center; gap: 8px; margin-top: 2px; }
+    .row > label { flex: 0 0 170px; }
+    .row > select, .row > input[type="text"], .row > input[type="password"] { flex: 1 1 auto; min-width: 0; }
+    .buttons { margin-top: 6px; display: flex; gap: 8px; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    #status, #token-status, #filters-status { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  </style>
+</head>
+<body>
+  <div class="pref-section">
+    <strong>twitch-tui configuration</strong>
+    <div class="row">
+      <label for="config-file">Config file</label>
+      <input id="config-file" type="text" data-pref-key="config_file" placeholder="~/.config/twt/config.toml" spellcheck="false">
+    </div>
+    <p class="small secondary pref-help">
+      Leave empty to search the places twitch-tui uses, in order: the
+      <span class="mono">TWT_CONFIG</span> environment variable (see below),
+      <span class="mono">~/.config/twt/config.toml</span> (the XDG location), then
+      <span class="mono">~/Library/Application Support/com.twitch-tui.twt/config.toml</span>
+      (what the <span class="mono">directories</span> crate derives from
+      <span class="mono">ProjectDirs::from("com", "twitch-tui", "twt")</span> on macOS), then
+      <span class="mono">~/Library/Preferences/com.twitch-tui.twt/config.toml</span>. The
+      <span class="mono">filters.txt</span> is read from the folder of the config file that was found,
+      and the Status line below always names the file that was used (or every path tried).
+      <span class="mono">TWT_CONFIG</span> is honoured only when it is present in IINA's own
+      environment (for example when IINA was launched from a shell that exported it); exporting it in
+      a shell profile after IINA started does not affect the running app.
+    </p>
+    <div class="row">
+      <label>Status</label>
+      <span id="status" class="small secondary">loading…</span>
+    </div>
+    <div class="buttons">
+      <button id="reload-config" type="button">Reload config</button>
+      <button id="open-folder" type="button">Open config folder</button>
+      <button id="refresh-status" type="button">Refresh status</button>
+    </div>
+  </div>
+
+  <div class="pref-section">
+    <strong>Automatic joining</strong>
+    <label style="display: block; margin-top: 2px">
+      <input type="checkbox" data-type="bool" data-pref-key="auto_join">
+      Detect the channel of the playing video
+    </label>
+    <p class="small secondary pref-help">
+      Detection trusts <span class="mono">twitch.tv/&lt;channel&gt;</span> URLs found in the video's URL,
+      path, file name, media title or playlist entry, and only guesses from the title when the same media
+      is demonstrably Twitch-sourced (so a YouTube video called
+      <span class="mono">Bob - highlights</span> never joins <span class="mono">#bob</span>).
+      With this switch on (the default), the plugin joins the channel of the playing video
+      automatically. Turn it off and the plugin never joins automatically. Detection itself is
+      always automatic: it runs on every file load.
+    </p>
+  </div>
+
+  <div class="pref-section">
+    <strong>Startup</strong>
+    <label style="display: block; margin-top: 2px">
+      <input type="checkbox" data-type="bool" data-pref-key="auto_open_browser">
+      Open the Twitch browser window when IINA starts
+    </label>
+    <p class="small secondary pref-help">
+      When IINA launches with nothing playing, the standalone Twitch browser window opens by
+      itself, once per launch. It waits a few seconds first: opening a stream or a file in that
+      window (or IINA restoring the last one) cancels it, and a window that is already open is
+      left alone. Opening it by hand (<span class="mono">⌘⇧W</span>) is unaffected.
+    </p>
+  </div>
+
+  <div class="pref-section">
+    <strong>Chat history</strong>
+    <label style="display: block; margin-top: 2px">
+      <input type="checkbox" data-type="bool" data-pref-key="history_remote">
+      Pre-fill the last 50 messages from a community recent-messages service
+    </label>
+    <p class="small secondary pref-help">
+      The plugin always keeps its own cache of the last 50 messages per channel (up to 20 channels,
+      at most 512 KB) in its data folder, so a channel you return to is not empty. With this option
+      on, a channel visited for the first time is pre-filled from
+      <span class="mono">recent-messages.robotty.de</span> — that request carries only the public
+      channel name, never your OAuth token. Twitch offers no chat-history API of its own.
+    </p>
+    <label style="display: block; margin-top: 6px">
+      <input type="checkbox" data-type="bool" data-pref-key="vod_chat_replay">
+      Replay a VOD's chat while it plays
+    </label>
+    <p class="small secondary pref-help">
+      While a Twitch VOD plays, the plugin fetches the chat that was posted during that broadcast
+      and replays it in sync with the video. This uses Twitch's undocumented GQL endpoint — not an
+      official API — so it may stop working if Twitch changes it. Live chat is hidden while a VOD
+      is playing.
+    </p>
+  </div>
+
+  <div class="pref-section">
+    <strong>OAuth token (only needed to send messages)</strong>
+    <div class="row">
+      <label>Token</label>
+      <span id="token-status" class="small secondary">unknown</span>
+    </div>
+    <div class="row">
+      <label for="token">New token</label>
+      <input id="token" type="password" placeholder="oauth:… (or a bare token)" spellcheck="false" autocomplete="off">
+    </div>
+    <div class="buttons">
+      <button id="save-token" type="button">Save to Keychain</button>
+      <button id="forget-token" type="button">Forget token</button>
+    </div>
+    <p class="small secondary pref-help">
+      The token is stored in the macOS Keychain and is only ever used for the IRC connection; it is
+      never written to the twt config file. <span class="mono">[twitch] token</span> in the config file
+      takes precedence. Chat is fully usable read-only without a token.
+    </p>
+  </div>
+
+  <div class="pref-section">
+    <strong>Chat appearance</strong>
+    <p class="small secondary pref-help">
+      Every control defaults to “Use config”; pick a value to override the twt config for this plugin.
+      The same overrides are available from the Settings tab in the sidebar.
+    </p>
+    <div id="override-controls"></div>
+  </div>
+
+  <div class="pref-section">
+    <strong>Filters</strong>
+    <div class="row">
+      <label>Loaded patterns</label>
+      <span id="filters-status" class="small secondary">unknown</span>
+    </div>
+    <div id="filter-controls"></div>
+    <p class="small secondary pref-help">
+      Patterns come from <span class="mono">[filters]</span> / <span class="mono">filters.txt</span> and are
+      applied by twitch-tui's rules (regex, falling back to a case-insensitive substring match;
+      <span class="mono">reversed</span> inverts the result). They cannot be edited here because the plugin
+      only ever reads the config file.
+    </p>
+  </div>
+
+  <script>
+  (function () {
+    "use strict";
+
+    var prefs = window.iina.preferences;
+
+    var OVERRIDES = [
+      { key: "palette", label: "Palette", type: "select", options: ["pastel", "vibrant", "warm", "cool"] },
+      { key: "theme", label: "Theme", type: "select", options: ["dark", "light", "system"], labels: { dark: "Dark", light: "Light", system: "System (follow macOS)" } },
+      { key: "showDatetimes", label: "Timestamps", type: "bool" },
+      { key: "datetimeFormat", label: "Timestamp format", type: "text", placeholder: "%H:%M:%S" },
+      { key: "usernameShown", label: "Show usernames", type: "bool" },
+      { key: "usernameHighlight", label: "Highlight mentions", type: "bool" },
+      { key: "badges", label: "Show badges", type: "bool" },
+      { key: "titleShown", label: "Show channel title", type: "bool" },
+      { key: "twitchEmotes", label: "Twitch emotes", type: "bool" },
+      { key: "betterttvEmotes", label: "BetterTTV emotes", type: "bool" },
+      { key: "seventvEmotes", label: "7TV emotes", type: "bool" },
+      { key: "frankerfacezEmotes", label: "FrankerFaceZ emotes", type: "bool" },
+      { key: "maxMessages", label: "Maximum messages", type: "text", placeholder: "use config (500)" },
+      { key: "delay", label: "Render delay (ms)", type: "text", placeholder: "use config (30)" }
+    ];
+
+    var FILTERS = [
+      { key: "message", label: "Message filter" },
+      { key: "username", label: "Username filter" }
+    ];
+
+    var controls = {};
+
+    function readOverrides(callback) {
+      prefs.get("ui_overrides", function (value) {
+        var parsed = null;
+        if (typeof value === "string" && value) {
+          try { parsed = JSON.parse(value); } catch (e) { parsed = null; }
+        }
+        callback(parsed && typeof parsed === "object" ? parsed : {});
+      });
+    }
+
+    function bumpCommand(name) {
+      prefs.get("command_seq", function (seq) {
+        prefs.set("command_seq", (Number(seq) || 0) + 1);
+        prefs.set("command_request", name);
+        setTimeout(loadStatus, 1200);
+      });
+    }
+
+    function loadStatus() {
+      prefs.get("status_line", function (value) {
+        document.getElementById("status").textContent = String(value || "-");
+      });
+      prefs.get("token_status", function (value) {
+        document.getElementById("token-status").textContent = String(value || "-");
+      });
+      prefs.get("filters_status", function (value) {
+        document.getElementById("filters-status").textContent = String(value || "-");
+      });
+    }
+
+    function makeRow(labelText, control) {
+      var row = document.createElement("div");
+      row.className = "row";
+      var label = document.createElement("label");
+      label.textContent = labelText;
+      row.appendChild(label);
+      row.appendChild(control);
+      return row;
+    }
+
+    function makeControl(spec) {
+      var control;
+      if (spec.type === "select" || spec.type === "bool") {
+        control = document.createElement("select");
+        var values = spec.type === "bool" ? ["", "true", "false"] : [""].concat(spec.options);
+        for (var i = 0; i < values.length; i++) {
+          var option = document.createElement("option");
+          option.value = values[i];
+          option.textContent = values[i] === ""
+            ? "Use config"
+            : ((spec.labels && spec.labels[values[i]]) || values[i]);
+          control.appendChild(option);
+        }
+      } else {
+        control = document.createElement("input");
+        control.type = "text";
+        control.placeholder = spec.placeholder || "use config";
+        control.spellcheck = false;
+      }
+      control.addEventListener("change", applyOverrides);
+      return control;
+    }
+
+    function buildControls() {
+      var container = document.getElementById("override-controls");
+      for (var i = 0; i < OVERRIDES.length; i++) {
+        var spec = OVERRIDES[i];
+        var control = makeControl(spec);
+        controls[spec.key] = control;
+        container.appendChild(makeRow(spec.label, control));
+      }
+      var filterContainer = document.getElementById("filter-controls");
+      for (i = 0; i < FILTERS.length; i++) {
+        var filterSpec = FILTERS[i];
+        var filterControl = makeControl({ type: "bool" });
+        controls["filter:" + filterSpec.key] = filterControl;
+        filterContainer.appendChild(makeRow(filterSpec.label, filterControl));
+      }
+    }
+
+    function syncControls(overrides) {
+      for (var i = 0; i < OVERRIDES.length; i++) {
+        var spec = OVERRIDES[i];
+        var value = overrides[spec.key];
+        var control = controls[spec.key];
+        if (value === undefined || value === null) {
+          control.value = "";
+        } else if (typeof value === "boolean") {
+          control.value = value ? "true" : "false";
+        } else {
+          control.value = String(value);
+        }
+      }
+      var enabled = overrides.filtersEnabled || {};
+      for (i = 0; i < FILTERS.length; i++) {
+        var filterValue = enabled[FILTERS[i].key];
+        controls["filter:" + FILTERS[i].key].value =
+          typeof filterValue === "boolean" ? (filterValue ? "true" : "false") : "";
+      }
+    }
+
+    function applyOverrides() {
+      var overrides = {};
+      for (var i = 0; i < OVERRIDES.length; i++) {
+        var spec = OVERRIDES[i];
+        var raw = controls[spec.key].value;
+        if (raw === "") continue;
+        if (spec.type === "bool") {
+          overrides[spec.key] = raw === "true";
+        } else if (spec.key === "maxMessages" || spec.key === "delay") {
+          var number = parseFloat(raw);
+          if (isFinite(number) && number >= 0) overrides[spec.key] = number;
+        } else {
+          overrides[spec.key] = raw;
+        }
+      }
+      var filters = {};
+      var hasFilters = false;
+      for (i = 0; i < FILTERS.length; i++) {
+        var filterRaw = controls["filter:" + FILTERS[i].key].value;
+        if (filterRaw === "") continue;
+        filters[FILTERS[i].key] = filterRaw === "true";
+        hasFilters = true;
+      }
+      if (hasFilters) overrides.filtersEnabled = filters;
+      prefs.set("ui_overrides", JSON.stringify(overrides));
+      setTimeout(loadStatus, 1200);
+    }
+
+    /* The static inputs carry data-pref-key (and data-type for the checkboxes);
+     * without this loop they render but never read or write a preference, which
+     * is what happened to the auto_join / history_remote / vod_chat_replay
+     * switches. The generated controls below use their own spec list. */
+    function bindStaticControls() {
+      var inputs = document.querySelectorAll("[data-pref-key]");
+      for (var i = 0; i < inputs.length; i++) {
+        (function (input) {
+          var key = input.getAttribute("data-pref-key");
+          var type = input.getAttribute("data-type") || "text";
+          if (type === "bool") {
+            prefs.get(key, function (value) {
+              input.checked = value === true || value === "true";
+            });
+            input.addEventListener("change", function () {
+              prefs.set(key, input.checked);
+            });
+          } else {
+            prefs.get(key, function (value) {
+              if (value !== null && value !== undefined) input.value = String(value);
+            });
+            input.addEventListener("change", function () {
+              prefs.set(key, input.value);
+            });
+          }
+        })(inputs[i]);
+      }
+    }
+
+    function init() {
+      bindStaticControls();
+      buildControls();
+      readOverrides(syncControls);
+      loadStatus();
+
+      document.getElementById("reload-config").addEventListener("click", function () {
+        bumpCommand("reload-config");
+      });
+      document.getElementById("open-folder").addEventListener("click", function () {
+        bumpCommand("open-config-folder");
+      });
+      document.getElementById("refresh-status").addEventListener("click", loadStatus);
+      document.getElementById("save-token").addEventListener("click", function () {
+        var input = document.getElementById("token");
+        var value = input.value.trim();
+        if (!value) return;
+        prefs.set("token_input", value);
+        input.value = "";
+        setTimeout(loadStatus, 1500);
+      });
+      document.getElementById("forget-token").addEventListener("click", function () {
+        bumpCommand("forget-token");
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", init);
+    if (document.readyState !== "loading") init();
+  })();
+  </script>
+</body>
+</html>

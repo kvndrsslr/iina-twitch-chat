@@ -1,0 +1,32 @@
+{
+  "id": "92038375",
+  "platform": "TWITCH",
+  "username": "caedrel",
+  "emote_set": {
+    "id": "01FSESZMBG0001Z3WXBKV368D1",
+    "name": "Caedrel's Emotes",
+    "emotes": [
+      {
+        "id": "01FS5ZCFG0000500DPPCXJWCP8",
+        "name": "o7",
+        "flags": 0,
+        "data": {
+          "id": "01FS5ZCFG0000500DPPCXJWCP8",
+          "name": "o7",
+          "animated": false
+        }
+      },
+      {
+        "id": "01FF3R5C30000FF5VVCKV49G6J",
+        "name": "xdd",
+        "flags": 0,
+        "data": {
+          "id": "01FF3R5C30000FF5VVCKV49G6J",
+          "name": "xdd",
+          "animated": false
+        }
+      }
+    ],
+    "emote_count": 1000
+  }
+}

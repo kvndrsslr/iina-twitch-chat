@@ -1,0 +1,25 @@
+{
+  "default_sets": [
+    3,
+    1539687
+  ],
+  "sets": {
+    "3": {
+      "id": 3,
+      "emoticons": [
+        {
+          "id": 9,
+          "name": "ZrehplaR",
+          "height": 30,
+          "width": 33
+        },
+        {
+          "id": 6,
+          "name": "YooHoo",
+          "height": 34,
+          "width": 28
+        }
+      ]
+    }
+  }
+}
