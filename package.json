@@ -1,5 +1,5 @@
 {
-  "name": "iina-twitch-chat",
+  "name": "twitch-iina",
   "private": true,
   "version": "1.5.0",
   "description": "Pure-logic modules for Twitch, the IINA plugin",

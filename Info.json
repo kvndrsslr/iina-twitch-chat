@@ -2,10 +2,10 @@
   "name": "Twitch",
   "version": "1.5.0",
   "identifier": "com.kdressler.iina-twitch-chat",
-  "ghRepo": "kvndrsslr/iina-twitch-chat",
+  "ghRepo": "kvndrsslr/twitch-iina",
   "ghVersion": 1,
   "author": {
-    "name": "iina-twitch-chat"
+    "name": "twitch-iina"
   },
   "description": "Show Twitch chat over the video, always bound to the stream that is playing, and browse Twitch from the sidebar. Reads its configuration from twitch-tui (~/.config/twt) and works read-only without an OAuth token.",
   "entry": "main.js",

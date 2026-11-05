@@ -29,7 +29,7 @@ Then either
   `~/Library/Application Support/com.colliderli.iina/plugins/`.
 
 Or install from GitHub: **IINA → Settings → Plugins → *Install from GitHub…*** and enter
-`kvndrsslr/iina-twitch-chat`. IINA downloads `Twitch.iinaplgz` from the latest release and prompts
+`kvndrsslr/twitch-iina`. IINA downloads `Twitch.iinaplgz` from the latest release and prompts
 for an update when `ghVersion` in `Info.json` increases.
 
 Two things bite here, both verified against IINA 1.5.0:
@@ -53,14 +53,14 @@ GitHub install path uses the package attached to the latest release instead.
 Or copy/symlink the plugin folder by hand:
 
 ```sh
-make link           # symlink this repo as iina-twitch-chat.iinaplugin-dev
+make link           # symlink this repo as twitch-iina.iinaplugin-dev
 make unlink
 ```
 
 `make link` creates
 
 ```
-~/Library/Application Support/com.colliderli.iina/plugins/iina-twitch-chat.iinaplugin-dev
+~/Library/Application Support/com.colliderli.iina/plugins/twitch-iina.iinaplugin-dev
 ```
 
 The `.iinaplugin-dev` suffix is required for IINA to treat the folder as a development
@@ -87,7 +87,7 @@ sidebar's/overlay's context menu → *Reload* — that also re-runs `ui/transpor
 | `make pack-check` | asserts the archive layout IINA's installer requires (`Info.json` at the root, no wrapping `*.iinaplugin` folder, `ui/sidebar.html` present, the `globalEntry` file present) |
 | `make check` | `node --check` on the plugin scripts and web view scripts + `Info.json` JSON parse |
 | `make test` | `npm test` (the `lib/` unit tests) |
-| `make link` | symlink the repo into IINA's plugin folder as `iina-twitch-chat.iinaplugin-dev` |
+| `make link` | symlink the repo into IINA's plugin folder as `twitch-iina.iinaplugin-dev` |
 | `make unlink` | remove that symlink |
 | `make clean` | remove `dist/` |
 

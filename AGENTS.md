@@ -27,14 +27,14 @@ root, not wrapped in a `Twitch.iinaplugin/` directory. IINA unpacks with
 
 ## Installing
 
-IINA → Settings → Plugins → *Install from GitHub…* → `kvndrsslr/iina-twitch-chat`. IINA uses the
+IINA → Settings → Plugins → *Install from GitHub…* → `kvndrsslr/twitch-iina`. IINA uses the
 latest release's `.iinaplgz`; the plugin stays disabled until enabled once in that pane.
 
 ## Releasing
 
 `Info.json` drives both installation and auto-update:
 
-- `ghRepo` must stay `kvndrsslr/iina-twitch-chat`.
+- `ghRepo` must stay `kvndrsslr/twitch-iina`.
 - `ghVersion` is an integer. IINA fetches
   `https://raw.githubusercontent.com/<ghRepo>/main/Info.json` and prompts when the remote
   `ghVersion` is greater than the installed one.
@@ -48,7 +48,7 @@ Steps:
 4. Tag `v<version>` — the tag must equal `Info.json`'s `version` — and push the tag.
 5. The `Release` workflow (`.github/workflows/release.yml`) runs `make test` and `make build` on
    Ubuntu, then attaches `dist/Twitch.iinaplgz` to the GitHub release.
-6. Verify with `gh release view v<version> -R kvndrsslr/iina-twitch-chat` and by downloading the
+6. Verify with `gh release view v<version> -R kvndrsslr/twitch-iina` and by downloading the
    asset without authentication.
 
 A published tag is immutable. Ship fixes with a new `version` and a higher `ghVersion`; do not move

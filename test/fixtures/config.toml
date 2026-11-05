@@ -1,4 +1,4 @@
-# iina-twitch test configuration, copied in spirit from twitch-tui's default-config.toml
+# twitch-iina test configuration, copied in spirit from twitch-tui's default-config.toml
 [twitch]
 # Your username from Twitch.
 username = "testbot"

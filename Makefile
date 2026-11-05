@@ -38,7 +38,7 @@ BUNDLE       := $(DIST_DIR)/$(PLUGIN_NAME).iinaplugin
 ARCHIVE      := $(DIST_DIR)/$(PLUGIN_NAME).iinaplgz
 
 PLUGIN_DIR   := $(HOME)/Library/Application Support/com.colliderli.iina/plugins
-LINK_NAME    := iina-twitch-chat.iinaplugin-dev
+LINK_NAME    := twitch-iina.iinaplugin-dev
 
 # Everything the plugin needs at runtime, in archive order. `lib` belongs to the
 # pure-logic modules; it is packaged when present.
