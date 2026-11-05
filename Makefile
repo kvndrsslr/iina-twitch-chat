@@ -92,20 +92,7 @@ verify:
 	if printf '%s\n' "$$have" | grep -Eq '(^|/)(__MACOSX|\.DS_Store|\._[^/]*)'; then \
 		echo "verify: FAIL - archive contains macOS junk entries" >&2; exit 1; \
 	fi; \
-	node -e ' \
-	  const fs = require("fs"), path = require("path"); \
-	  const [file, root] = process.argv.slice(1); \
-	  const bad = (m) => { console.error("verify: FAIL - " + m); process.exit(1); }; \
-	  const j = JSON.parse(fs.readFileSync(file, "utf8")); \
-	  for (const k of ["name", "identifier", "version", "entry"]) { \
-	    if (typeof j[k] !== "string" || j[k].length === 0) bad("Info.json has no string " + k); \
-	  } \
-	  if (!j.author || typeof j.author.name !== "string" || j.author.name.length === 0) bad("Info.json has no author.name"); \
-	  if (!j.identifier.split(".").every((s) => s.length > 0 && [...s].every((c) => /[A-Za-z0-9_-]/.test(c)))) bad("identifier is not reverse-DNS"); \
-	  if (!fs.existsSync(path.join(root, j.entry))) bad("entry file " + j.entry + " is missing"); \
-	  if (typeof j.globalEntry === "string" && j.globalEntry.length > 0 && !fs.existsSync(path.join(root, j.globalEntry))) bad("globalEntry file " + j.globalEntry + " is missing"); \
-	  console.log("verify: Info.json required fields decode"); \
-	' "$$tmp/plugins/.temp/Info.json" "$$tmp/plugins/.temp"; \
+	node scripts/verify-package.js "$$tmp/plugins/.temp"; \
 	for f in Info.json main.js global.js README.md CHANGELOG.md; do \
 		cmp "$(CURDIR)/$$f" "$$tmp/plugins/.temp/$$f" || { echo "verify: FAIL - $$f differs from the working tree" >&2; exit 1; }; \
 	done; \
