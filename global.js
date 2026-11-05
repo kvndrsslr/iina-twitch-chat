@@ -68,6 +68,7 @@ var configLib = loadLib("config", "config");
 var helixLib = loadLib("helix", "helix");
 var webviewLib = loadLib("webview", "webview");
 var hostenvLib = loadLib("hostenv", "hostenv");
+var migrateLib = loadLib("migrate", "migrate");
 
 var state = {
   windowGone: false,
@@ -348,9 +349,38 @@ iina.global.onMessage(OPEN_NEW_PLAYER_MESSAGE, function (data) {
   }
 });
 
+/* IINA keys preferences (`.preferences/<identifier>.plist`) and @data by the
+ * manifest identifier, so a rename starts this build empty. lib/migrate.js
+ * copies the 1.5.0 state once; the identifier and the plugins directory are
+ * read back from @data instead of hard-coded. */
+function migrateLegacyState() {
+  if (!migrateLib || typeof migrateLib.run !== "function") return;
+  /* parsePath() only recognises the "@data/" prefix, not a bare "@data"
+   * (iina/JavascriptAPI.swift); the trailing slash makes it expand. */
+  var data = hostenv.resolvePath("@data/");
+  var pluginsDir = migrateLib.pluginsDirFromDataPath(data);
+  var identifier = migrateLib.identifierFromDataPath(data);
+  if (!pluginsDir || !identifier) return;
+  try {
+    var result = migrateLib.run({
+      identifier: identifier,
+      pluginsDir: pluginsDir,
+      preferences: iina.preferences,
+      file: iina.file,
+      readText: hostenv.readTextFile
+    });
+    if (result.status === "migrated") {
+      log("migrated " + result.keys + " preference(s) and " + result.files + " data file(s) from " + migrateLib.LEGACY_IDENTIFIER);
+    }
+  } catch (e) {
+    logWarn("preference migration failed: " + e);
+  }
+}
+
 /* The menu and the view listeners do not depend on the environment, so they are
  * registered at once; the /usr/bin/env probe only refines HOME and re-reads the
  * token (a token saved since launch is picked up on the view's ready message). */
+migrateLegacyState();
 loadToken();
 setupMenu();
 hostenv.readEnvironment(function (env) {

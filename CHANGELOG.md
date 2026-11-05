@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+* **The plugin's identifier is now `com.kdressler.twitch-iina`.** IINA keys
+  `.preferences/<identifier>.plist` and `.data/<identifier>/` by it, so a renamed plugin normally
+  starts with default settings and no cached chat history. The first launch after the update runs
+  `lib/migrate.js`: every preference key the new file does not already hold is copied from
+  `com.kdressler.iina-twitch-chat.plist`, `@data/history.json` is copied if this install has none,
+  and a `migrated_from` marker makes later launches no-ops. The Keychain token cannot move: IINA
+  reads and writes it under `"<identifier> - twitch-chat"`
+  (`JavascriptAPIUtils.swift`, `keychainWrite`), so a token saved in the plugin's preferences page
+  must be entered once after the update — a token in the twitch-tui config keeps working. IINA also
+  stores the enabled flag per identifier, so the plugin appears disabled in *Settings → Plugins*
+  and has to be enabled once; the migration runs on that first load.
 * **A stream no longer opens black when IINA has the video track disabled.** `vid` is a global
   mpv option, and IINA saves it (with `aid`) into the URL's watch-later file and applies it again
   before a file starts. IINA's yt-dlp plugin then resolves `bestaudio/best` (it checks

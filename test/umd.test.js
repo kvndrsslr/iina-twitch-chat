@@ -44,6 +44,10 @@ const LIBS = {
     name: "hostenv",
     keys: ["DEFAULT_TIMEOUT_MS", "create"],
   },
+  "migrate.js": {
+    name: "migrate",
+    keys: ["LEGACY_IDENTIFIER", "MARKER_KEY", "DATA_FILES", "parsePlist", "pluginsDirFromDataPath", "identifierFromDataPath", "run"],
+  },
 };
 
 function sourceFor(file) {
@@ -89,7 +93,7 @@ test("shared namespace: browser loads accumulate on one TwitchPlugin object", ()
   }
   assert.deepEqual(
     Object.keys(sandbox.TwitchPlugin).sort(),
-    ["config", "emotes", "helix", "hostenv", "irc", "strftime", "webview"]
+    ["config", "emotes", "helix", "hostenv", "irc", "migrate", "strftime", "webview"]
   );
   assert.equal(sandbox.TwitchPlugin.irc.CHAT_URL, "wss://irc-ws.chat.twitch.tv:443");
 });

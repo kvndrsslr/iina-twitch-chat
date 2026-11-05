@@ -1,7 +1,7 @@
 {
   "name": "Twitch",
   "version": "1.5.0",
-  "identifier": "com.kdressler.iina-twitch-chat",
+  "identifier": "com.kdressler.twitch-iina",
   "ghRepo": "kvndrsslr/twitch-iina",
   "ghVersion": 1,
   "author": {

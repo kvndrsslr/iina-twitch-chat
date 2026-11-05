@@ -35,6 +35,10 @@ latest release's `.iinaplgz`; the plugin stays disabled until enabled once in th
 `Info.json` drives both installation and auto-update:
 
 - `ghRepo` must stay `kvndrsslr/twitch-iina`.
+- `identifier` is `com.kdressler.twitch-iina`. IINA keys `.preferences/<identifier>.plist` and
+  `.data/<identifier>/` by it (and its Keychain service, `"<identifier> - twitch-chat"`), so a
+  further rename must keep `lib/migrate.js`'s legacy copy in mind; the entry scripts derive the
+  current identifier from `@data` and never spell it out.
 - `ghVersion` is an integer. IINA fetches
   `https://raw.githubusercontent.com/<ghRepo>/main/Info.json` and prompts when the remote
   `ghVersion` is greater than the installed one.

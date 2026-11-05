@@ -24,6 +24,7 @@ var ircLib = loadLib("irc", "irc");
 var helixLib = loadLib("helix", "helix");
 var webviewLib = loadLib("webview", "webview");
 var hostenvLib = loadLib("hostenv", "hostenv");
+var migrateLib = loadLib("migrate", "migrate");
 
 var VERSION = "1.5.0";
 
@@ -3205,8 +3206,37 @@ function handleRequest(request) {
 
 /* ----------------------------------------------------------------- palette */
 
+/* IINA keys preferences (`.preferences/<identifier>.plist`) and @data by the
+ * manifest identifier, so a rename starts this build empty. lib/migrate.js
+ * copies the 1.5.0 state once; the identifier and the plugins directory are
+ * read back from @data instead of hard-coded. */
+function migrateLegacyState() {
+  if (!migrateLib || typeof migrateLib.run !== "function") return;
+  /* parsePath() only recognises the "@data/" prefix, not a bare "@data"
+   * (iina/JavascriptAPI.swift); the trailing slash makes it expand. */
+  var data = resolvePath("@data/");
+  var pluginsDir = migrateLib.pluginsDirFromDataPath(data);
+  var identifier = migrateLib.identifierFromDataPath(data);
+  if (!pluginsDir || !identifier) return;
+  try {
+    var result = migrateLib.run({
+      identifier: identifier,
+      pluginsDir: pluginsDir,
+      preferences: iina.preferences,
+      file: iina.file,
+      readText: readTextFile
+    });
+    if (result.status === "migrated") {
+      log("migrated " + result.keys + " preference(s) and " + result.files + " data file(s) from " + migrateLib.LEGACY_IDENTIFIER);
+    }
+  } catch (e) {
+    logWarn("preference migration failed: " + e);
+  }
+}
+
 function boot() {
   log("Twitch v" + VERSION + " loading");
+  migrateLegacyState();
   state.overlayVisible = readPref("overlay_visible", false) === true;
   readEnvironment(function () {
     if (state.windowGone) return;

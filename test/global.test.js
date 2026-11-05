@@ -24,11 +24,13 @@ const CONFIG_JS = require("../lib/config.js");
 const HELIX_JS = require("../lib/helix.js");
 const WEBVIEW_JS = require("../lib/webview.js");
 const HOSTENV_JS = require("../lib/hostenv.js");
+const MIGRATE_JS = require("../lib/migrate.js");
 const LIB_BY_SPEC = {
   "./lib/config.js": CONFIG_JS,
   "./lib/helix.js": HELIX_JS,
   "./lib/webview.js": WEBVIEW_JS,
-  "./lib/hostenv.js": HOSTENV_JS
+  "./lib/hostenv.js": HOSTENV_JS,
+  "./lib/migrate.js": MIGRATE_JS
 };
 const PLAYER_APIS = ["core", "mpv", "event", "overlay", "sidebar", "playlist", "subtitle", "input"];
 const VALIDATE = "https://id.twitch.tv/oauth2/validate";
@@ -70,14 +72,15 @@ function boot(options) {
     },
     preferences: {
       get: (k) => (Object.prototype.hasOwnProperty.call(prefs, k) ? prefs[k] : undefined),
-      set(k, v) { calls.prefsSet.push(k); prefs[k] = v; }
+      set(k, v) { calls.prefsSet.push(k); prefs[k] = v; },
+      sync() {}
     },
     file: {
       exists: (p) => Object.prototype.hasOwnProperty.call(files, p),
       read: (p) => files[p]
     },
     utils: {
-      resolvePath: (p) => p.replace(/^~\//, "/Users/stub/"),
+      resolvePath: (p) => p === "@data/" && opts.dataPath ? opts.dataPath : p.replace(/^~\//, "/Users/stub/"),
       exec: () => Promise.resolve({ status: 0, stdout: "HOME=/Users/stub\n", stderr: "" }),
       keyChainRead: () => opts.keychain === undefined ? "keytok" : opts.keychain,
       open: () => true
@@ -334,4 +337,32 @@ test("auto_open_browser leaves an already open window alone", async () => {
   app.handlers.global["twt:auto-open-browser"]();
   assert.equal(windowOpens(app), 1, "the startup request does not re-open it");
   assert.equal(app.calls.log.some((m) => /already open/.test(m)), true);
+});
+
+const xmlPlist = (entries) => `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+${Object.keys(entries).map((k) => `<key>${k}</key><string>${entries[k]}</string>`).join("\n")}
+</dict>
+</plist>
+`;
+
+test("the 1.5.0 preferences are copied before the entry reads them", async () => {
+  const LEGACY = "com.kdressler.iina-twitch-chat";
+  const CURRENT = "com.kdressler.twitch-iina";
+  const plugins = "/Users/stub/Library/Application Support/com.colliderli.iina/plugins";
+  const app = boot({
+    dataPath: `${plugins}/.data/${CURRENT}`,
+    files: {
+      [`${plugins}/.preferences/${LEGACY}.plist`]:
+        xmlPlist({ config_file: "/tmp/cfg.toml", last_channel: "caedrel" })
+    }
+  });
+  await micro();
+  assert.deepEqual(app.calls.prefsSet, ["config_file", "last_channel", "migrated_from"]);
+  assert.equal(app.prefs.config_file, "/tmp/cfg.toml");
+  assert.equal(app.prefs.migrated_from, LEGACY);
+  assert.equal(app.calls.log.some((m) => /migrated 2 preference/.test(m)), true,
+    "the migration is logged with its key count");
 });

@@ -20,13 +20,15 @@ const IRC_JS = require("../lib/irc.js");
 const HELIX_JS = require("../lib/helix.js");
 const WEBVIEW_JS = require("../lib/webview.js");
 const HOSTENV_JS = require("../lib/hostenv.js");
+const MIGRATE_JS = require("../lib/migrate.js");
 /* the libs main.js requires at module load, by spec */
 const LIB_BY_SPEC = {
   "./lib/config.js": CONFIG_JS,
   "./lib/irc.js": IRC_JS,
   "./lib/helix.js": HELIX_JS,
   "./lib/webview.js": WEBVIEW_JS,
-  "./lib/hostenv.js": HOSTENV_JS
+  "./lib/hostenv.js": HOSTENV_JS,
+  "./lib/migrate.js": MIGRATE_JS
 };
 const MANIFEST_SRC = fs.readFileSync(path.join(ROOT, "Info.json"), "utf8");
 const MANIFEST = JSON.parse(MANIFEST_SRC);
@@ -228,7 +230,7 @@ test("the libs are required exactly once, at module load (no runtime require)", 
   app.handlers.sidebar["twt:history-request"]({ id: "r1", channel: "chan", roomId: "1", count: 50 });
   await micro();
   assert.deepStrictEqual(app.calls.require.map((r) => r.spec).sort(),
-    ["./lib/config.js", "./lib/helix.js", "./lib/hostenv.js", "./lib/irc.js", "./lib/webview.js"]);
+    ["./lib/config.js", "./lib/helix.js", "./lib/hostenv.js", "./lib/irc.js", "./lib/migrate.js", "./lib/webview.js"]);
   assert.equal(app.calls.require.filter((r) => r.runtime).length, 0, "require() was called at runtime, which traps in IINA");
   teardown(app);
 });
@@ -1969,14 +1971,13 @@ test("every allowed path is served with its query intact, and the dead follows p
  *
  * The plugin is called "Twitch": the chat is what it shows, not what it is -
  * so no user-visible string carries the old "Chat" suffix any more. The bundle
- * identifier deliberately keeps its old value - it
- * keys the stored preferences and the plugin's data folder, so changing it
- * would orphan every existing setting.
+ * identifier follows the repository rename; the 1.5.0 identifier survives only
+ * in lib/migrate.js, which ports the preferences and history it keyed.
  */
 test("the manifest and the sidebar tab are named Twitch, with no stale product name left", () => {
   assert.equal(MANIFEST.name, "Twitch");
   assert.equal(MANIFEST.sidebarTab.name, "Twitch");
-  assert.equal(MANIFEST.identifier, "com.kdressler.iina-twitch-chat", "the identifier must not change");
+  assert.equal(MANIFEST.identifier, "com.kdressler.twitch-iina", "the identifier follows the plugin name");
   assert.equal(/Twitch Chat/.test(MANIFEST.description), false);
 
   /* The one deliberate exception: the OSD sentence shown when the overlay is
@@ -1991,6 +1992,26 @@ test("the manifest and the sidebar tab are named Twitch, with no stale product n
   assert.ok(MAIN.indexOf('menuItem("Toggle Twitch Overlay"') !== -1, "the overlay item is renamed");
   assert.ok(MAIN.indexOf('menuItem("Show Twitch Sidebar"') !== -1, "the sidebar item is renamed");
   assert.equal(/log\("Twitch Chat v"/.test(MAIN), false, "the boot line is renamed");
+});
+
+test("the 1.5.0 identifier survives only in the migration module", () => {
+  /* The identifier keys `.preferences/<identifier>.plist` and `.data/<identifier>`;
+   * the rename would silently start from empty, so lib/migrate.js copies the old
+   * state once. Nothing else may reference the old identifier: a stale copy in an
+   * entry script would mean a half-rename. */
+  const LEGACY = "com.kdressler.iina-twitch-chat";
+  const MIGRATE_SRC = fs.readFileSync(path.join(ROOT, "lib", "migrate.js"), "utf8");
+  for (const entry of [["main.js", MAIN], ["global.js", GLOBAL_SRC], ["Info.json", MANIFEST_SRC]]) {
+    assert.equal(entry[1].includes(LEGACY), false, entry[0] + " still carries the old identifier");
+  }
+  assert.equal(MIGRATE_JS.LEGACY_IDENTIFIER, LEGACY);
+  assert.ok(MIGRATE_SRC.includes(`"${LEGACY}"`), "lib/migrate.js names the identifier it migrates from");
+  assert.equal(/LEGACY_IDENTIFIER = "[^"]+"/.test(MIGRATE_SRC), true);
+  /* A bare "@data" throws in parsePath() and would make the migration a silent
+   * no-op, so the entries must ask for "@data/". */
+  for (const entry of [["main.js", MAIN], ["global.js", GLOBAL_SRC]]) {
+    assert.ok(/resolvePath\("@data\/"\)/.test(entry[1]), entry[0] + " resolves the @data/ prefix");
+  }
 });
 
 test("the script's version string and the manifest version cannot drift apart", () => {

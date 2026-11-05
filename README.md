@@ -10,7 +10,8 @@ anonymously and read-only with no token, and works with no configuration file at
   `lib/irc.js`, `lib/config.js`, `lib/emotes.js`, `lib/strftime.js`, plus `lib/helix.js`
   (the single Helix allowlist + proxy engine used by the player and global entries),
   `lib/webview.js` (the bridge codec: base64-encodes payload strings containing a backtick or
-  `${`) and `lib/hostenv.js` (config-file/HOME plumbing shared by both entries)
+  `${`), `lib/hostenv.js` (config-file/HOME plumbing shared by both entries) and `lib/migrate.js`
+  (the one-time copy of a 1.5.0 install's preferences and cached history onto this identifier)
 * Tests: `test/**` (`npm test`)
 
 ---
@@ -42,9 +43,9 @@ Two things bite here, both verified against IINA 1.5.0:
   `iina-plugin pack` does) and `make pack-check` guards the layout.
 * **A plugin is disabled until it is enabled once.** IINA stores this per identifier
   (`PluginEnabled.<identifier>` in IINA's defaults, `JavascriptPlugin.enabled`), so after the first
-  install (or after the first `make link`) open **IINA → Settings → Plugins**, select *Twitch*
-  and enable it. Without that, IINA logs `Loaded JS plugin: Twitch <version> (disabled)` and
-  nothing else happens.
+  install, after an update that changes the identifier (1.5.0 → this version), or after the first
+  `make link`, open **IINA → Settings → Plugins**, select *Twitch* and enable it. Without that,
+  IINA logs `Loaded JS plugin: Twitch <version> (disabled)` and nothing else happens.
 
 `dist/` is a build artifact produced by `make build` (and removed by `make clean`): it is
 git-ignored and not part of the repository, so build it locally before installing that way. The
@@ -261,9 +262,12 @@ and the panel falls back to its CSS default.
 **Upgrading from 1.0.x.** An older `{x, y, w, h}` entry in `overlay_layouts` is still read: its
 position becomes anchor `tl` (`dx = x`, `dy = y`) and it is rewritten in the anchored shape on the
 next save. A stored `overlay_layout_locked` key is simply ignored — the plugin no longer reads it.
-The bundle identifier is unchanged (`com.kdressler.iina-twitch-chat`), so IINA keeps the plugin's
-preferences and its data folder (`@data/history.json` and the cached chat history) across the
-rename.
+The bundle identifier changed to `com.kdressler.twitch-iina` with the repository rename; the first
+launch copies every preference the new file does not already hold from
+`com.kdressler.iina-twitch-chat.plist`, and copies `@data/history.json` when this install has none
+(`lib/migrate.js`, marked `migrated_from`), so the layout and the cached chat history survive.
+The Keychain token does not: IINA scopes it by identifier, so re-enter it once in
+**IINA → Settings → Twitch** (a token in the twitch-tui config keeps working).
 
 ---
 
